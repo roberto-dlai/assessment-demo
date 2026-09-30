@@ -20,10 +20,8 @@ session-seed ownership (mint-or-restore, fingerprint-scoped), a safe
 localStorage wrapper with in-memory fallback, and a GitHub Pages deploy
 workflow. Quiz/results remain placeholders until M2–M4.
 
-> **Deploy note:** `.github/workflows/deploy-pages.yml` is ready, but GitHub
-> Pages is not yet enabled — Pages on a **private** repo requires a paid plan.
-> Make the repo public (free Pages) or upgrade the plan to activate it. Base
-> paths are all relative and verified to work from a project subpath.
+**Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
+`main` via `.github/workflows/deploy-pages.yml`).
 
 ## Running locally
 

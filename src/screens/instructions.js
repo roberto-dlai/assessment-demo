@@ -2,9 +2,9 @@
 
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
-import { announce, focusHeading } from "../util/a11y.js";
+import { focusHeading } from "../util/a11y.js";
 import { setAutoAdvance } from "../prefs.js";
-import { hasSavedProgress, clearSession, getOrCreateSeed } from "../session.js";
+import { hasSavedProgress, startFresh } from "../session.js";
 
 const TYPE_LABELS = {
   single_selection: "Multiple choice — one answer",
@@ -30,15 +30,13 @@ export function renderInstructions(root, app) {
     actions(root, app)
   );
 
+  // Moving focus to the h1 makes the screen reader announce the title; a
+  // separate announcement here would double-speak, so we rely on focus alone.
   focusHeading(h1);
-  announce(`${meta.capability_name}. Instructions.`, { assertive: true });
 }
 
 function metaLine(meta) {
-  const bits = [
-    meta.audience,
-    meta.estimated_duration ? `${meta.estimated_duration} (estimated guide)` : "",
-  ].filter(Boolean);
+  const bits = [meta.audience, meta.estimated_duration, "no time limit"].filter(Boolean);
   return el("p", "screen__meta", bits.join(" · "));
 }
 
@@ -50,12 +48,22 @@ function summary(counts) {
   );
 }
 
+// A <section> is only exposed as a landmark region if it has an accessible name,
+// so each section's <h2> is given an id and referenced via aria-labelledby.
+function labelledSection(modifier, headingText, headingId) {
+  const wrap = el("section", modifier);
+  const h2 = el("h2", "", headingText);
+  h2.id = headingId;
+  wrap.setAttribute("aria-labelledby", headingId);
+  wrap.append(h2);
+  return wrap;
+}
+
 function typeLegend(model) {
   const present = new Map();
   for (const q of model.questions) present.set(q.type, (present.get(q.type) || 0) + 1);
 
-  const wrap = el("section", "legend");
-  wrap.append(el("h2", "", "Question types"));
+  const wrap = labelledSection("legend", "Question types", "legend-heading");
   const list = el("ul", "legend__list");
   for (const [type, count] of present) {
     const label = TYPE_LABELS[type] || type;
@@ -66,8 +74,7 @@ function typeLegend(model) {
 }
 
 function howItWorks() {
-  const wrap = el("section", "howto");
-  wrap.append(el("h2", "", "How it works"));
+  const wrap = labelledSection("howto", "How it works", "howto-heading");
   const list = el("ul", "howto__list");
   for (const note of [
     "Move freely between questions — use Back, Next, or the question navigator to jump to any question.",
@@ -83,20 +90,25 @@ function howItWorks() {
 
 function autoAdvanceToggle(app) {
   const wrap = el("div", "toggle");
+  const row = el("div", "toggle__row");
+
   const input = el("input", "toggle__input");
   input.type = "checkbox";
   input.id = "auto-advance";
   input.checked = Boolean(app.prefs.autoAdvance);
+  input.setAttribute("aria-describedby", "auto-advance-help");
 
   const label = el("label", "toggle__label", "Auto-advance to the next question when I answer");
   label.setAttribute("for", "auto-advance");
 
-  input.addEventListener("change", () => {
-    app.setPrefs(setAutoAdvance(input.checked));
-    announce(input.checked ? "Auto-advance on." : "Auto-advance off.");
-  });
+  // No live-region announcement: the native checkbox conveys its own checked
+  // state to assistive tech, so announcing would double-speak.
+  input.addEventListener("change", () => app.setPrefs(setAutoAdvance(input.checked)));
 
-  wrap.append(input, label);
+  row.append(input, label);
+  const help = el("p", "toggle__help", "You can change this anytime.");
+  help.id = "auto-advance-help";
+  wrap.append(row, help);
   return wrap;
 }
 
@@ -108,8 +120,7 @@ function actions(root, app) {
     // Resume is the primary action; starting over is secondary (SPEC §3.1).
     const resume = primaryButton("Resume", () => app.go(SCREENS.QUIZ));
     const startOver = secondaryButton("Start over", () => {
-      clearSession(fingerprint);
-      app.setSessionSeed(getOrCreateSeed(fingerprint));
+      app.setSessionSeed(startFresh(fingerprint));
       app.go(SCREENS.QUIZ);
     });
     wrap.append(resume, startOver);

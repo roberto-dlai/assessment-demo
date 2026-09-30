@@ -214,6 +214,19 @@ test("normalizeAssessment rejects malformed input", () => {
   assert.throws(() => normalizeAssessment({ challenges: [] }));
 });
 
+test("normalizeAssessment tolerates an empty challenge (skipped, not thrown)", () => {
+  // SPEC §10: an empty challenge is skipped in navigation, not an error.
+  const m = clone(rawAssessment);
+  m.challenges.push({ challenge_number: 99, scenario: "empty", questions: [] });
+  const model = normalizeAssessment(m);
+  assert.equal(model.counts.challenges, rawAssessment.challenges.length + 1);
+  // question count is unchanged; the empty challenge contributes none
+  const rawCount = rawAssessment.challenges.reduce((n, c) => n + c.questions.length, 0);
+  assert.equal(model.counts.questions, rawCount);
+  const empty = model.challenges.find((c) => c.challenge_number === 99);
+  assert.deepEqual(empty.questions, []);
+});
+
 test("normalizeAssessment throws on duplicate question ids", () => {
   const m = clone(rawAssessment);
   m.challenges[0].questions[1].id = m.challenges[0].questions[0].id;

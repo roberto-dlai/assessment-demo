@@ -8,7 +8,9 @@ const DEFAULTS = Object.freeze({ autoAdvance: true });
 
 /** @returns {{autoAdvance: boolean}} */
 export function loadPrefs() {
-  return { ...DEFAULTS, ...(getJSON(PREFS_KEY) || {}) };
+  const stored = getJSON(PREFS_KEY);
+  const src = stored && typeof stored === "object" && !Array.isArray(stored) ? stored : {};
+  return { ...DEFAULTS, ...src };
 }
 
 /** @param {{autoAdvance: boolean}} prefs */
