@@ -14,7 +14,6 @@
 
 const POINTS_PER_QUESTION = 1; // SPEC §5
 
-const SELECTION_TYPES = new Set(["single_selection", "multiple_selections"]);
 const ALL_TYPES = new Set([
   "single_selection",
   "multiple_selections",
@@ -65,7 +64,6 @@ export function normalizeAssessment(raw) {
     audience: raw.audience ?? "",
     estimated_duration: raw.estimated_duration ?? "",
     lead_scenario: raw.lead_scenario ?? "",
-    status: raw.status ?? "",
   };
 
   const challenges = [];
@@ -95,10 +93,21 @@ export function normalizeAssessment(raw) {
     throw new Error("Assessment contains no questions.");
   }
 
+  // Reject duplicate question ids: they'd break per-question keying (rng streams,
+  // answer state) even though the synthetic `uid` is index-based and unique.
+  const byId = new Map();
+  for (const q of questions) {
+    if (byId.has(q.id)) {
+      throw new Error(`Duplicate question id "${q.id}" — question ids must be unique.`);
+    }
+    byId.set(q.id, q);
+  }
+
   return {
     meta,
     challenges,
     questions,
+    byId,
     fingerprint: fingerprintQuestions(questions),
     counts: {
       challenges: challenges.length,
@@ -123,31 +132,41 @@ function normalizeQuestion(q, challengeNumber, index) {
   if (!ALL_TYPES.has(q.type)) {
     throw new Error(`Question ${id} has unknown type "${q.type}".`);
   }
-  str(q.prompt, `question ${id} prompt`);
+  const prompt = str(q.prompt, `question ${id} prompt`);
+
+  // `uid` is a stable, globally-unique internal key (from the global index) used
+  // to build item ids and to seed per-question shuffles (SPEC §2.5) — so even a
+  // duplicate authored `q.id` can't cause item-id collisions or shared rng streams.
+  const uid = `q${index}`;
 
   const base = {
     id,
+    uid,
     type: q.type,
     behavior: q.behavior ?? "",
-    prompt: q.prompt,
+    prompt,
     challengeNumber,
     index,
     points: POINTS_PER_QUESTION,
   };
 
-  if (SELECTION_TYPES.has(q.type)) {
-    return { ...base, ...normalizeSelection(q, id) };
+  switch (q.type) {
+    case "single_selection":
+    case "multiple_selections":
+      return { ...base, ...normalizeSelection(q, id, uid) };
+    case "grouping":
+      return { ...base, ...normalizeGrouping(q, id, uid) };
+    case "matching":
+      return { ...base, ...normalizeMatching(q, id, uid) };
+    case "ordering":
+      return { ...base, ...normalizeOrdering(q, id, uid) };
+    default:
+      // Unreachable: guarded by ALL_TYPES above.
+      throw new Error(`Unhandled question type "${q.type}".`);
   }
-  if (q.type === "grouping") {
-    return { ...base, ...normalizeGrouping(q, id) };
-  }
-  if (q.type === "matching") {
-    return { ...base, ...normalizeMatching(q, id) };
-  }
-  return { ...base, ...normalizeOrdering(q, id) };
 }
 
-function normalizeSelection(q, id) {
+function normalizeSelection(q, id, uid) {
   if (!Array.isArray(q.options) || q.options.length === 0) {
     throw new Error(`Question ${id} (${q.type}) needs a non-empty 'options' array.`);
   }
@@ -155,7 +174,7 @@ function normalizeSelection(q, id) {
     if (!o || typeof o.label !== "string") {
       throw new Error(`Question ${id} option ${i} is missing a 'label'.`);
     }
-    return { id: `${id}::opt::${i}`, label: o.label, correct: Boolean(o.correct) };
+    return { id: `${uid}::opt::${i}`, label: o.label, correct: Boolean(o.correct) };
   });
   const correctCount = options.filter((o) => o.correct).length;
   if (correctCount === 0) {
@@ -167,7 +186,7 @@ function normalizeSelection(q, id) {
   return { options };
 }
 
-function normalizeGrouping(q, id) {
+function normalizeGrouping(q, id, uid) {
   if (!q.groups || typeof q.groups !== "object" || Array.isArray(q.groups)) {
     throw new Error(`Question ${id} (grouping) needs a 'groups' object.`);
   }
@@ -186,7 +205,7 @@ function normalizeGrouping(q, id) {
       if (typeof label !== "string") {
         throw new Error(`Question ${id} group "${name}" has a non-string item.`);
       }
-      items.push({ id: `${id}::item::${i++}`, label, correctGroup: name });
+      items.push({ id: `${uid}::item::${i++}`, label, correctGroup: name });
     }
   }
   if (items.length === 0) {
@@ -195,7 +214,7 @@ function normalizeGrouping(q, id) {
   return { groupNames, items };
 }
 
-function normalizeMatching(q, id) {
+function normalizeMatching(q, id, uid) {
   if (!Array.isArray(q.pairs) || q.pairs.length === 0) {
     throw new Error(`Question ${id} (matching) needs a non-empty 'pairs' array.`);
   }
@@ -206,8 +225,8 @@ function normalizeMatching(q, id) {
     if (!p || typeof p.left !== "string" || typeof p.right !== "string") {
       throw new Error(`Question ${id} pair ${i} needs string 'left' and 'right'.`);
     }
-    const leftId = `${id}::L::${i}`;
-    const rightId = `${id}::R::${i}`;
+    const leftId = `${uid}::L::${i}`;
+    const rightId = `${uid}::R::${i}`;
     lefts.push({ id: leftId, label: p.left });
     rights.push({ id: rightId, label: p.right });
     solution[leftId] = rightId;
@@ -215,7 +234,7 @@ function normalizeMatching(q, id) {
   return { lefts, rights, solution };
 }
 
-function normalizeOrdering(q, id) {
+function normalizeOrdering(q, id, uid) {
   if (!Array.isArray(q.correct_order) || q.correct_order.length === 0) {
     throw new Error(`Question ${id} (ordering) needs a non-empty 'correct_order' array.`);
   }
@@ -223,7 +242,7 @@ function normalizeOrdering(q, id) {
     if (typeof label !== "string") {
       throw new Error(`Question ${id} correct_order item ${i} is not a string.`);
     }
-    return { id: `${id}::step::${i}`, label, correctIndex: i };
+    return { id: `${uid}::step::${i}`, label, correctIndex: i };
   });
   return { items, solutionOrder: items.map((it) => it.id) };
 }
@@ -241,10 +260,10 @@ export function fingerprintQuestions(questions) {
     parts.push(q.id, q.type, q.prompt);
     if (q.options) parts.push(...q.options.map((o) => `${o.label}#${o.correct ? 1 : 0}`));
     if (q.items && q.groupNames) parts.push(...q.items.map((it) => `${it.label}@${it.correctGroup}`));
-    if (q.lefts) parts.push(...q.lefts.map((l) => l.label), ...q.rights.map((r) => r.label));
-    if (q.items && q.solutionOrder) parts.push(...q.items.map((it) => it.label));
+    if (q.lefts) parts.push(...q.lefts.map((l, i) => `${l.label}=>${q.rights[i].label}`));
+    if (q.items && q.solutionOrder) parts.push(...q.items.map((it, i) => `${i}:${it.label}`));
   }
-  return cyrb53(parts.join(""));
+  return cyrb53(parts.join("|"));
 }
 
 // cyrb53 — a fast, well-distributed 53-bit string hash rendered as hex.

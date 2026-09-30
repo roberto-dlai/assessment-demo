@@ -56,9 +56,15 @@ src/
   data/loadAssessment.js   # load, validate, normalize, flatten, fingerprint
   util/prng.js             # mulberry32 seeded PRNG + helpers
   util/shuffle.js          # deterministic shuffles
-  screens/                 # instructions / quiz / results (placeholders for now)
+  util/a11y.js             # announce() + focusHeading() live-region helpers
+  screens/
+    dom.js                 # shared el()/mountScreen()/heading() helpers
+    instructions.js        # instructions / quiz / results / error
+    quiz.js                #   (screens are placeholders until M1-M4)
+    results.js
+    error.js
 test/
-  util.test.js             # M0 unit tests
+  util.test.js             # M0 unit tests (19)
 ```
 
 All asset paths are **relative** so the app works from a GitHub Pages project

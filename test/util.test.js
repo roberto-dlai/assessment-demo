@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { mulberry32, hashStringToSeed, questionRng } from "../src/util/prng.js";
+import { mulberry32, hashStringToSeed, questionRng, makeSessionSeed } from "../src/util/prng.js";
 import { shuffle, shuffleUntil, sameOrder } from "../src/util/shuffle.js";
 import { normalizeAssessment, fingerprintQuestions } from "../src/data/loadAssessment.js";
 
@@ -37,6 +37,22 @@ test("questionRng reproduces the same stream from session seed + id", () => {
   assert.equal(r1(), r2());
 });
 
+test("questionRng gives independent streams for different ids (and sessions)", () => {
+  // §2.5 relies on each question shuffling independently.
+  assert.notEqual(questionRng(999, "2.1")(), questionRng(999, "2.2")());
+  assert.notEqual(questionRng(1, "2.1")(), questionRng(2, "2.1")());
+  // All 18 real question uids produce distinct first draws for a fixed session.
+  const model = normalizeAssessment(rawAssessment);
+  const firsts = model.questions.map((q) => questionRng(12345, q.uid)());
+  assert.equal(new Set(firsts).size, firsts.length);
+});
+
+test("makeSessionSeed returns an unsigned 32-bit integer", () => {
+  const s = makeSessionSeed();
+  assert.ok(Number.isInteger(s));
+  assert.ok(s >= 0 && s <= 0xffffffff);
+});
+
 test("shuffle is a reproducible permutation", () => {
   const src = [1, 2, 3, 4, 5, 6, 7, 8];
   const out1 = shuffle(src, mulberry32(42));
@@ -54,6 +70,45 @@ test("shuffleUntil avoids the disallowed order deterministically", () => {
   // reproducible
   const again = shuffleUntil(correct, mulberry32(7), (cand) => sameOrder(cand, correct));
   assert.deepEqual(result, again);
+});
+
+test("shuffleUntil forces inequality for length >= 2 via a deterministic swap", () => {
+  // A 2-element list has only one alternative ordering, so the disallowed order
+  // must be avoided regardless of seed.
+  for (const seed of [0, 1, 2, 3, 99]) {
+    const out = shuffleUntil(["a", "b"], mulberry32(seed), (c) => sameOrder(c, ["a", "b"]));
+    assert.deepEqual(out, ["b", "a"]);
+  }
+  // Pathological predicate that is never satisfiable must still terminate and
+  // return a same-length permutation (no hang).
+  const out = shuffleUntil(["a", "b", "c"], mulberry32(5), () => true);
+  assert.equal(out.length, 3);
+  assert.deepEqual([...out].sort(), ["a", "b", "c"]);
+});
+
+test("shuffleUntil returns a single-element list unchanged (cannot differ)", () => {
+  assert.deepEqual(shuffleUntil(["x"], mulberry32(3), () => true), ["x"]);
+});
+
+test("ordering questions round-trip: resolved order reproduces and differs from correct", () => {
+  const model = normalizeAssessment(rawAssessment);
+  const ordering = model.questions.filter((q) => q.type === "ordering");
+  assert.ok(ordering.length > 0);
+  const SEED = 24680;
+  for (const q of ordering) {
+    const resolve = () =>
+      shuffleUntil(q.items, questionRng(SEED, q.uid), (cand) =>
+        sameOrder(cand, q.items, (it) => it.id)
+      );
+    const first = resolve();
+    const second = resolve();
+    assert.equal(sameOrder(first, q.items, (it) => it.id), false, `${q.id} must differ from correct`);
+    assert.deepEqual(
+      first.map((it) => it.id),
+      second.map((it) => it.id),
+      `${q.id} must reproduce from the same seed`
+    );
+  }
 });
 
 test("normalizeAssessment flattens challenges and assigns 1 point each", () => {
@@ -102,18 +157,97 @@ test("each question type normalizes its answer key", () => {
   }
 });
 
-test("fingerprint is stable but changes when content changes", () => {
-  const a = normalizeAssessment(rawAssessment);
-  const b = normalizeAssessment(JSON.parse(JSON.stringify(rawAssessment)));
-  assert.equal(a.fingerprint, b.fingerprint);
+test("normalizeAssessment exposes a byId lookup covering every question", () => {
+  const model = normalizeAssessment(rawAssessment);
+  assert.equal(model.byId.size, model.questions.length);
+  for (const q of model.questions) assert.equal(model.byId.get(q.id), q);
+});
 
-  const mutated = JSON.parse(JSON.stringify(rawAssessment));
-  mutated.challenges[0].questions[0].prompt += " (edited)";
-  assert.notEqual(fingerprintQuestions(normalizeAssessment(mutated).questions), a.fingerprint);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const fp = (raw) => normalizeAssessment(raw).fingerprint;
+
+test("fingerprint is stable across reloads and changes on prompt edits", () => {
+  const base = fp(rawAssessment);
+  assert.equal(base, fp(clone(rawAssessment)));
+
+  const m = clone(rawAssessment);
+  m.challenges[0].questions[0].prompt += " (edited)";
+  assert.notEqual(fp(m), base);
+});
+
+test("fingerprint detects answer-key drift for every type", () => {
+  const base = fp(rawAssessment);
+
+  // single/multiple selection: move which option is correct (question 1.3 is
+  // single_selection) — keeps exactly one correct but changes the answer key.
+  const sel = clone(rawAssessment);
+  const q13 = sel.challenges[0].questions.find((q) => q.id === "1.3");
+  const ci = q13.options.findIndex((o) => o.correct);
+  q13.options[ci].correct = false;
+  q13.options[(ci + 1) % q13.options.length].correct = true;
+  assert.notEqual(fp(sel), base, "moving the correct option must change the fingerprint");
+
+  // grouping: move an item to a different group (question 1.1)
+  const grp = clone(rawAssessment);
+  const q11 = grp.challenges[0].questions.find((q) => q.id === "1.1");
+  const names = Object.keys(q11.groups);
+  q11.groups[names[1]].push(q11.groups[names[0]].shift());
+  assert.notEqual(fp(grp), base, "moving a grouping item must change the fingerprint");
+
+  // matching: re-pair by swapping two rights (question 2.1) — the label SETS are
+  // unchanged, only the pairing differs, so this is the case the old code missed.
+  const mat = clone(rawAssessment);
+  const q21 = mat.challenges[1].questions.find((q) => q.id === "2.1");
+  [q21.pairs[0].right, q21.pairs[1].right] = [q21.pairs[1].right, q21.pairs[0].right];
+  assert.notEqual(fp(mat), base, "re-pairing a matching question must change the fingerprint");
+
+  // ordering: swap two steps (question 3.2)
+  const ord = clone(rawAssessment);
+  const q32 = ord.challenges[2].questions.find((q) => q.id === "3.2");
+  [q32.correct_order[0], q32.correct_order[1]] = [q32.correct_order[1], q32.correct_order[0]];
+  assert.notEqual(fp(ord), base, "reordering must change the fingerprint");
 });
 
 test("normalizeAssessment rejects malformed input", () => {
   assert.throws(() => normalizeAssessment(null));
   assert.throws(() => normalizeAssessment({}));
   assert.throws(() => normalizeAssessment({ challenges: [] }));
+});
+
+test("normalizeAssessment throws on duplicate question ids", () => {
+  const m = clone(rawAssessment);
+  m.challenges[0].questions[1].id = m.challenges[0].questions[0].id;
+  assert.throws(() => normalizeAssessment(m), /Duplicate question id/);
+});
+
+test("normalizeAssessment enforces per-type answer-key validity", () => {
+  const wrap = (question) => ({
+    capability_name: "T",
+    challenges: [{ challenge_number: 1, scenario: "s", questions: [question] }],
+  });
+
+  // empty options
+  assert.throws(() => normalizeAssessment(wrap({ id: "x", type: "single_selection", prompt: "p", options: [] })));
+  // single_selection with two correct
+  assert.throws(() =>
+    normalizeAssessment(
+      wrap({
+        id: "x",
+        type: "single_selection",
+        prompt: "p",
+        options: [
+          { label: "a", correct: true },
+          { label: "b", correct: true },
+        ],
+      })
+    )
+  );
+  // matching with a non-string pair
+  assert.throws(() =>
+    normalizeAssessment(wrap({ id: "x", type: "matching", prompt: "p", pairs: [{ left: "a", right: 3 }] }))
+  );
+  // grouping with fewer than two groups
+  assert.throws(() =>
+    normalizeAssessment(wrap({ id: "x", type: "grouping", prompt: "p", groups: { only: ["a"] } }))
+  );
 });

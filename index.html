@@ -20,9 +20,15 @@
   <body>
     <a class="skip-link" href="#app">Skip to content</a>
 
+    <header class="site-header">
+      <!-- Logo placeholder: swap in the official coral horizontal DeepLearning.AI
+           lockup (one color, no distortion) per SPEC §8. -->
+      <span class="site-header__logo" aria-label="DeepLearning.AI">DeepLearning.AI</span>
+    </header>
+
     <main id="app" class="app">
       <!-- Screens render here -->
-      <p class="app__loading">Loading assessment…</p>
+      <p class="app__loading" role="status">Loading assessment…</p>
     </main>
 
     <!-- Live regions for assistive tech (SPEC §4.7) -->

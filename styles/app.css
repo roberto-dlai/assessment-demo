@@ -2,6 +2,11 @@
    M0: minimal shell styling; component styles arrive alongside their
    milestones. */
 
+:root {
+  /* App-level neutral text token (theme.css has no neutral grey). ~7:1 on white. */
+  --app-text-muted: #595959;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,6 +14,24 @@
 body {
   margin: 0;
   line-height: 1.5;
+}
+
+/* Global visible-focus baseline so every focusable control is covered by
+   default (SPEC §9); individual components can refine but not remove it. */
+:focus-visible {
+  outline: 3px solid var(--dl-blue);
+  outline-offset: 2px;
+}
+
+/* Site header / logo lockup */
+.site-header {
+  padding: 0.75rem clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid #eee;
+}
+.site-header__logo {
+  font-family: var(--dl-font-heading);
+  font-weight: 600;
+  color: var(--dl-coral);
 }
 
 .app {
@@ -40,20 +63,15 @@ body {
 
 .screen__summary {
   margin: 0;
-  color: #444;
+  color: var(--app-text-muted);
 }
 
 .dl-btn {
   align-self: flex-start;
 }
 
-.dl-btn:focus-visible {
-  outline: 3px solid var(--dl-blue);
-  outline-offset: 2px;
-}
-
 .app__loading {
-  color: #666;
+  color: var(--app-text-muted);
 }
 
 .screen--error h1 {
@@ -85,4 +103,16 @@ body {
 }
 .skip-link:focus {
   left: 0;
+}
+
+/* Respect reduced-motion for future transitions (auto-advance, drawer/modal). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

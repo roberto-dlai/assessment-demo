@@ -8,6 +8,7 @@ import { createApp, SCREENS } from "./state.js";
 import { renderInstructions } from "./screens/instructions.js";
 import { renderQuiz } from "./screens/quiz.js";
 import { renderResults } from "./screens/results.js";
+import { renderError } from "./screens/error.js";
 
 const root = document.getElementById("app");
 
@@ -27,24 +28,11 @@ function render(a) {
   }
 }
 
-function renderError(container, a) {
-  container.innerHTML = "";
-  const section = document.createElement("section");
-  section.className = "screen screen--error";
-  const h = document.createElement("h1");
-  h.textContent = "Something went wrong";
-  h.tabIndex = -1;
-  const msg = document.createElement("p");
-  msg.textContent = a.error ? a.error.message : "Unknown error.";
-  section.append(h, msg);
-  container.append(section);
-  h.focus();
-}
-
 async function boot() {
   try {
     const model = await loadAssessment();
     app.setModel(model);
+    document.title = `${model.meta.capability_name} — Assessment`;
 
     // M0 acceptance: prove the parse + flatten worked.
     console.log("[assessment] loaded:", model.meta.capability_name);

@@ -39,6 +39,13 @@ export function shuffleUntil(array, rng, isEqual, maxAttempts = 20) {
     candidate = shuffle(array, rng);
     attempts++;
   }
+  // If we exhausted attempts and it's still disallowed, force inequality with a
+  // deterministic swap (reproducible on reload). Only possible when length >= 2
+  // AND the two swapped positions actually differ; a list of identical/one
+  // element genuinely cannot differ, so we return it as-is.
+  if (isEqual(candidate) && candidate.length >= 2) {
+    [candidate[0], candidate[1]] = [candidate[1], candidate[0]];
+  }
   return candidate;
 }
 

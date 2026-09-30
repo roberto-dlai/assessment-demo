@@ -4,26 +4,23 @@
 // auto-advance toggle.
 
 import { SCREENS } from "../state.js";
+import { el, mountScreen, heading } from "./dom.js";
+import { announce, focusHeading } from "../util/a11y.js";
 
 export function renderInstructions(root, app) {
   const { meta, counts } = app.model;
-  root.innerHTML = "";
+  const section = mountScreen(root, "instructions");
 
-  const section = el("section", "screen screen--instructions");
-  section.append(
-    el("h1", "", meta.capability_name),
-    metaLine(meta),
-    paragraph(meta.lead_scenario),
-    summary(counts)
-  );
+  const h1 = heading(meta.capability_name);
+  section.append(h1, metaLine(meta), el("p", "screen__lead", meta.lead_scenario), summary(counts));
 
   const start = el("button", "dl-btn dl-btn--primary", "Start assessment");
   start.type = "button";
   start.addEventListener("click", () => app.go(SCREENS.QUIZ));
   section.append(start);
 
-  root.append(section);
-  focusHeading(section);
+  focusHeading(h1);
+  announce(`${meta.capability_name}. Instructions.`, { assertive: true });
 }
 
 function metaLine(meta) {
@@ -34,29 +31,9 @@ function metaLine(meta) {
 }
 
 function summary(counts) {
-  const p = el(
+  return el(
     "p",
     "screen__summary",
     `${counts.challenges} challenges · ${counts.questions} questions · ${counts.totalPoints} points`
   );
-  return p;
-}
-
-function paragraph(text) {
-  return el("p", "screen__lead", text);
-}
-
-function el(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text != null) node.textContent = text;
-  return node;
-}
-
-function focusHeading(section) {
-  const h = section.querySelector("h1");
-  if (h) {
-    h.tabIndex = -1;
-    h.focus({ preventScroll: false });
-  }
 }
