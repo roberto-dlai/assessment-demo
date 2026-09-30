@@ -1,0 +1,383 @@
+{
+  "capability_name": "Spec-Driven Development with Agentic Coding",
+  "status": "draft",
+  "audience": "Beginners to spec-driven and agentic coding workflows",
+  "estimated_duration": "25-30 minutes",
+  "lead_scenario": "You've joined the engineering team at a startup building ContextCafe - the web app for a cozy neighborhood coffee shop, where regulars browse the seasonal menu, place mobile orders, and earn loyalty rewards. The team is retiring its ad-hoc vibe coding habits and adopting spec-driven development with an agentic coding assistant.",
+  "skills_framework": [
+    {
+      "skill_area": "Foundations of Spec-Driven Development",
+      "skills": [
+        {
+          "skill": "Distinguishing vibe coding from spec-driven development",
+          "behaviors": [
+            "Identify the characteristics and limitations of vibe coding",
+            "Explain the core benefits of specs: controlling large changes with small edits, reducing context decay, and improving intent fidelity",
+            "Differentiate coding agents from chatbots"
+          ]
+        },
+        {
+          "skill": "Understanding the SDD workflow and the developer's role",
+          "behaviors": [
+            "Describe the cycle of constitution, feature loops, and replanning",
+            "Recognize the human's role as architect and supervisor who supplies context",
+            "Select the right level of detail to give an agent"
+          ]
+        }
+      ]
+    },
+    {
+      "skill_area": "Running the Spec-Driven Workflow",
+      "skills": [
+        {
+          "skill": "Authoring the project constitution",
+          "behaviors": [
+            "Identify the three constitution pillars: mission, tech stack, and roadmap",
+            "Draft the constitution through human-in-the-loop conversation with the agent",
+            "Maintain the constitution as a living, version-controlled document"
+          ]
+        },
+        {
+          "skill": "Executing the feature development loop",
+          "behaviors": [
+            "Plan a feature spec covering plan, requirements, and validation before coding",
+            "Implement features in small, manageable steps with cleanly cleared context",
+            "Validate work as the human in the loop using review, tests, and sub-agent deep reviews"
+          ]
+        },
+        {
+          "skill": "Replanning and adapting the workflow",
+          "behaviors": [
+            "Decide when to handle a change during replanning versus scheduling it as a new roadmap feature",
+            "Keep specs and code in sync to prevent drift and reduce cognitive and AI fatigue",
+            "Introduce SDD to brownfield/legacy projects by reverse-engineering specs from existing artifacts"
+          ]
+        }
+      ]
+    },
+    {
+      "skill_area": "Scaling and Standardizing SDD",
+      "skills": [
+        {
+          "skill": "Automating and standardizing the SDD workflow",
+          "behaviors": [
+            "Use agent skills to automate repeatable SDD workflows",
+            "Choose between MCP servers and CLI-plus-skills for extending an agent",
+            "Apply agent standards such as AGENTS.md, Agent Skills, and ACP to stay agent-independent"
+          ]
+        }
+      ]
+    }
+  ],
+  "proficiency_level_descriptors": {
+    "beginning": [
+      "Recognize how spec-driven development differs from vibe coding and why specs reduce technical debt.",
+      "Identify the core building blocks of the workflow: the constitution's mission, tech stack, and roadmap.",
+      "Understand the developer's role as an architect who guides a coding agent rather than writing every line."
+    ],
+    "developing": [
+      "Draft a project constitution and feature specs through human-in-the-loop conversation with an agent.",
+      "Run the feature loop-plan, implement, and validate-in small, reviewable steps that keep context clean.",
+      "Apply spec-driven development to an existing legacy project while keeping specs and code in sync."
+    ],
+    "accomplished": [
+      "Decide when to replan versus schedule new roadmap features, managing context and AI fatigue across a project.",
+      "Automate repeatable parts of the workflow with agent skills and choose between MCP and CLI-plus-skills.",
+      "Leverage agent standards to keep a spec-driven workflow portable across different agents and IDEs."
+    ]
+  },
+  "challenges": [
+    {
+      "challenge_number": 1,
+      "scenario": "In your first week, a teammate is skeptical that changing how you prompt the agent even matters. To make the case, you need to be clear on what separates quick, prompt-and-hope coding from a disciplined spec-driven approach - and why it matters as the product grows.",
+      "questions": [
+        {
+          "id": "1.1",
+          "type": "grouping",
+          "behavior": "Identify the characteristics and limitations of vibe coding",
+          "prompt": "You're explaining to your teammate how two ways of working with a coding agent differ. Sort each practice into the approach it best describes.",
+          "groups": {
+            "Vibe coding": [
+              "Prompting the agent to make it work, eyeballing the result, and re-prompting until it looks right",
+              "Relying on a long back-and-forth chat whose history is never saved as a durable artifact",
+              "Accepting whatever architectural choices the agent improvises so you can move fast"
+            ],
+            "Spec-driven development": [
+              "Writing down the problem, success criteria, and constraints before the agent generates code",
+              "Keeping a maintained document that persists intent across sessions and even across different agents",
+              "Steering large code changes by editing a few sentences of a shared written contract"
+            ]
+          }
+        },
+        {
+          "id": "1.2",
+          "type": "grouping",
+          "behavior": "Explain the core benefits of specs",
+          "prompt": "Your teammate asks why writing specs is worth the effort. Group these as a benefit or not a benefit of spec-driven development with a coding agent.",
+          "groups": {
+            "Benefit": [
+              "Large code changes can be steered by small edits to the spec, cutting cognitive overhead",
+              "Essential context persists across sessions, keeping a stateless agent anchored as its window fills",
+              "Stating the problem and success criteria up front makes the agent's output match your intent"
+            ],
+            "Not a benefit": [
+              "A detailed enough spec guarantees correct code, so human review is no longer needed",
+              "Specs let the agent run fully autonomously, removing the need for any human decisions"
+            ]
+          }
+        },
+        {
+          "id": "1.3",
+          "type": "single_selection",
+          "behavior": "Differentiate coding agents from chatbots",
+          "prompt": "Your team keeps saying spec-driven development needs a coding agent, not just a chatbot. What capability most distinguishes a coding agent from a chatbot?",
+          "options": [
+            {"label": "It can read your codebase and use your tools, then plan and act toward a goal", "correct": true},
+            {"label": "It produces longer, more detailed answers whenever you provide a longer prompt", "correct": false},
+            {"label": "It automatically refactors your entire codebase", "correct": false},
+            {"label": "It retains the full chat history so context carries over between sessions", "correct": false}
+          ]
+        }
+      ]
+    },
+    {
+      "challenge_number": 2,
+      "scenario": "With the team on board, you sketch how the work will actually flow - from setting project-wide direction to shipping individual features - and where you, the human, fit into a loop run largely by the agent.",
+      "questions": [
+        {
+          "id": "2.1",
+          "type": "matching",
+          "behavior": "Describe the cycle of constitution, feature loops, and replanning",
+          "prompt": "Match each stage of the spec-driven workflow to what it accomplishes.",
+          "pairs": [
+            {"left": "Constitution", "right": "Sets the project-wide mission, tech stack, and roadmap that guide all future work"},
+            {"left": "Feature loop", "right": "Takes one feature through planning, implementation, and validation on its own branch"},
+            {"left": "Replanning", "right": "Revisits the constitution, roadmap, and process between features to adjust course"},
+            {"left": "Human in the loop", "right": "Reviews and accepts the agent's output, asking for changes where needed"}
+          ]
+        },
+        {
+          "id": "2.2",
+          "type": "matching",
+          "behavior": "Recognize the human's role as architect and supervisor who supplies context",
+          "prompt": "In spec-driven development you act as the architect while the agent does the building. Match each part of your role to what it involves.",
+          "pairs": [
+            {"left": "Design", "right": "Set the goals, constraints, and success criteria in the spec"},
+            {"left": "Supervise", "right": "Follow the agent's progress and steer it when it drifts"},
+            {"left": "Review", "right": "Accept the finished work or ask for changes"},
+            {"left": "Delegate", "right": "Leave low-level choices like variable names to the agent"}
+          ]
+        },
+        {
+          "id": "2.3",
+          "type": "grouping",
+          "behavior": "Select the right level of detail to give an agent",
+          "prompt": "You're deciding how much detail to put in a spec for the agent. Sort each item by whether it belongs in the spec or is better left to the agent to decide.",
+          "groups": {
+            "Belongs in the spec": [
+              "The product's mission, target audience, and business constraints",
+              "The success criteria and how the feature will be validated",
+              "A required technology the whole team must standardize on"
+            ],
+            "Better left to the agent": [
+              "Exact variable and helper-function names",
+              "How a given helper function is implemented internally",
+              "Whether to use a `for` loop or a `while` loop"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "challenge_number": 3,
+      "scenario": "It's time to write ContextCafe's constitution: the high-level agreement that will steer every future change. You sit down with the agent to draft it together.",
+      "questions": [
+        {
+          "id": "3.1",
+          "type": "matching",
+          "behavior": "Identify the three constitution pillars: mission, tech stack, and roadmap",
+          "prompt": "ContextCafe's constitution has three pillars. Match each pillar to the content it captures.",
+          "pairs": [
+            {"left": "Mission", "right": "The project's why: vision, audiences, and scope"},
+            {"left": "Tech stack", "right": "Agreed tools, frameworks, and infrastructure for development and deployment"},
+            {"left": "Roadmap", "right": "A living sequence of phases, each built as its own feature"}
+          ]
+        },
+        {
+          "id": "3.2",
+          "type": "ordering",
+          "behavior": "Draft the constitution through human-in-the-loop conversation with the agent",
+          "prompt": "Working with the agent to draft the constitution, put these collaborative steps in the order the course follows.",
+          "correct_order": [
+            "Give the agent the project description and point it at the stakeholders' notes in the README",
+            "Answer the agent's questions about the mission's tone, the tech stack, and roadmap detail",
+            "Let the agent turn your answers into the mission, tech-stack, and roadmap files",
+            "Review what the agent produced and keep the conversation going to fill any gaps",
+            "Commit the constitution so it becomes the project's living reference"
+          ]
+        },
+        {
+          "id": "3.3",
+          "type": "single_selection",
+          "behavior": "Maintain the constitution as a living, version-controlled document",
+          "prompt": "You notice the mission left out ContextCafe's target audience. To keep the constitution's related documents complete, what's the best way to fix it according to spec-driven best practice?",
+          "options": [
+            {"label": "Ask the agent to revise the mission statement", "correct": true},
+            {"label": "Note the missing audience in the commit message", "correct": false},
+            {"label": "Ask the agent to add the note only to the code", "correct": false},
+            {"label": "Keep the audience in a separate file of your own", "correct": false}
+          ]
+        }
+      ]
+    },
+    {
+      "challenge_number": 4,
+      "scenario": "The constitution is committed. Now you tackle the first roadmap feature, moving it through planning, implementation, and validation while keeping each step small enough to review.",
+      "questions": [
+        {
+          "id": "4.1",
+          "type": "grouping",
+          "behavior": "Plan a feature spec covering plan, requirements, and validation before coding",
+          "prompt": "A feature spec for ContextCafe is organized into three documents. Sort each detail into the document where it belongs.",
+          "groups": {
+            "Plan": [
+              "The order in which the parts of the feature get built",
+              "How the work will be broken into small, reviewable steps"
+            ],
+            "Requirements": [
+              "The specific API endpoints the feature must expose",
+              "The sections the landing page must display"
+            ],
+            "Validation": [
+              "An automated test asserting the endpoint returns the expected response",
+              "The scorecard the agent uses to confirm it met the spec"
+            ]
+          }
+        },
+        {
+          "id": "4.2",
+          "type": "ordering",
+          "behavior": "Implement features in small, manageable steps with cleanly cleared context",
+          "prompt": "Put the steps of implementing a spec-driven feature in the order the course follows.",
+          "correct_order": [
+            "Clear the agent's context so it starts from the committed spec rather than stale memory",
+            "Prompt the agent to build the task groups defined in the feature plan",
+            "Watch the console output to follow the changes the agent makes as it works",
+            "Review the diff and, if it's wrong, ask the agent to fix it",
+            "Run the app to confirm the corrected feature works"
+          ]
+        },
+        {
+          "id": "4.3",
+          "type": "multiple_selections",
+          "behavior": "Validate work as the human in the loop using review, tests, and sub-agent deep reviews",
+          "prompt": "After the agent implements a feature, you validate it as the human in the loop. Which practices fit that validation step? Select all that apply.",
+          "options": [
+            {"label": "Reviewing the diff to confirm the feature works and matches the spec", "correct": true},
+            {"label": "Running the app and stepping through tests under the debugger to confirm behavior", "correct": true},
+            {"label": "Asking the agent to spawn sub-agents for a deeper review that preserves the main context window", "correct": true},
+            {"label": "Approving the change because the agent reported that all its tests passed", "correct": false},
+            {"label": "Focusing the review mainly on code style and naming rather than functional correctness", "correct": false}
+          ]
+        }
+      ]
+    },
+    {
+      "challenge_number": 5,
+      "scenario": "ContextCafe is evolving. Priorities shift, new requirements arrive, and the team even wants to bring an older, spec-less project into the same workflow. You decide how and when to adjust course.",
+      "questions": [
+        {
+          "id": "5.1",
+          "type": "single_selection",
+          "behavior": "Decide when to handle a change during replanning versus scheduling it as a new roadmap feature",
+          "prompt": "During replanning, the product manager asks for a large new capability that will take significant work. How should you handle it?",
+          "options": [
+            {"label": "Schedule it on the roadmap as its own feature phase, not inline", "correct": true},
+            {"label": "Start building it right away in the current branch to keep momentum", "correct": false},
+            {"label": "Prototype it now during replanning and decide later whether to integrate it", "correct": false},
+            {"label": "Defer it to the next planning cycle without adding it to the roadmap", "correct": false}
+          ]
+        },
+        {
+          "id": "5.2",
+          "type": "grouping",
+          "behavior": "Keep specs and code in sync to prevent drift and reduce cognitive and AI fatigue",
+          "prompt": "Some working habits keep a spec-driven project's specs and code aligned; others let them drift apart. Sort each habit into the right group.",
+          "groups": {
+            "Keeps specs and code aligned": [
+              "Ask the agent to update related docs whenever the code changes",
+              "Work in small steps with frequent commits you can review",
+              "Record decisions in the spec, not just in the code"
+            ],
+            "Lets them drift apart": [
+              "Move files without telling the agent",
+              "Hand-edit the code and skip updating the specs",
+              "Let the README and specs lag behind the shipped code"
+            ]
+          }
+        },
+        {
+          "id": "5.3",
+          "type": "ordering",
+          "behavior": "Introduce SDD to brownfield/legacy projects by reverse-engineering specs from existing artifacts",
+          "prompt": "Put the steps for introducing spec-driven development to an existing, spec-less project in the order the course follows.",
+          "correct_order": [
+            "Point the agent at the existing codebase so it can reverse-engineer a constitution",
+            "Commit the reconstructed mission, tech stack, and roadmap as the foundation",
+            "Select the highest-priority feature to work on",
+            "Plan that feature's specification together with the agent",
+            "Build and validate the feature as the human in the loop"
+          ]
+        }
+      ]
+    },
+    {
+      "challenge_number": 6,
+      "scenario": "As the practice spreads across the team, you look for ways to make the workflow faster, repeatable, and portable - so it isn't tied to any one agent or tool.",
+      "questions": [
+        {
+          "id": "6.1",
+          "type": "grouping",
+          "behavior": "Use agent skills to automate repeatable SDD workflows",
+          "prompt": "Agent skills are best for definable, repeatable workflows. Sort each task by whether it's a good candidate to package as a skill.",
+          "groups": {
+            "Good candidate for a skill": [
+              "The multi-step prompt you repeat to start every feature spec",
+              "Updating the changelog on each merge to main",
+              "A validation routine: update the README, lint, format, and write tests"
+            ],
+            "Not a good fit for a skill": [
+              "Deciding the product's overall mission and target audience",
+              "Making a one-time architecture choice unique to this project",
+              "Judging whether a risky new feature is worth building at all"
+            ]
+          }
+        },
+        {
+          "id": "6.2",
+          "type": "single_selection",
+          "behavior": "Choose between MCP servers and CLI-plus-skills for extending an agent",
+          "prompt": "Your team needs to give the agent up-to-date package documentation. You can add it through a Model Context Protocol (MCP) server, or through a CLI tool invoked by a skill. Why are teams increasingly favoring the CLI-plus-skill option?",
+          "options": [
+            {"label": "It can take action with less setup than running a dedicated MCP server", "correct": true},
+            {"label": "It renders documentation with richer formatting than an MCP server provides", "correct": false},
+            {"label": "It speeds up repeated lookups by keeping a local copy", "correct": false},
+            {"label": "It queries several package registries at once for broader coverage", "correct": false}
+          ]
+        },
+        {
+          "id": "6.3",
+          "type": "matching",
+          "behavior": "Apply agent standards such as AGENTS.md, Agent Skills, and ACP to stay agent-independent",
+          "prompt": "Match each agent tool or standard to the role it plays in keeping your workflow from being tied to one agent.",
+          "pairs": [
+            {"left": "MCP (Model Context Protocol)", "right": "Connects an agent to external tools and data sources"},
+            {"left": "AGENTS.md", "right": "Records project rules and context for the agent"},
+            {"left": "Agent Skills", "right": "Packages repeatable workflows with the context needed to run them"},
+            {"left": "Plugins", "right": "Bundle installable agent extensions to share across a team"}
+          ]
+        }
+      ]
+    }
+  ]
+}
