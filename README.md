@@ -18,7 +18,15 @@ normalize → flatten, with stable item ids and a content fingerprint).
 data-derived type legend, how-it-works), a persisted auto-advance toggle,
 session-seed ownership (mint-or-restore, fingerprint-scoped), a safe
 localStorage wrapper with in-memory fallback, and a GitHub Pages deploy
-workflow. Quiz/results remain placeholders until M2–M4.
+workflow.
+
+**M2 — Quiz shell & navigation: complete.** Keyed state-mutation API
+(currentIndex/answers/interacted/resolvedOrderings, patched in place — no
+full re-render), question panel (scenario banner, challenge/point meta,
+prompt), Back/Next + challenge-grouped navigator with status icons and
+jump-to, a progress indicator, and a mobile navigator drawer with focus trap.
+The per-type answer widgets and scoring are the placeholders that land in
+M3–M4.
 
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`).
