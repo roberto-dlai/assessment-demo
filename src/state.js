@@ -25,9 +25,21 @@ export function createApp(onChange) {
     screen: SCREENS.INSTRUCTIONS,
     /** @type {Error|null} */
     error: null,
+    /** @type {number|null} per-assessment shuffle seed (SPEC §2.5) */
+    sessionSeed: null,
+    /** @type {{autoAdvance: boolean}} global user preferences (SPEC §4.6) */
+    prefs: { autoAdvance: true },
 
     setModel(model) {
       this.model = model;
+      return this;
+    },
+    setSessionSeed(seed) {
+      this.sessionSeed = seed;
+      return this;
+    },
+    setPrefs(prefs) {
+      this.prefs = prefs;
       return this;
     },
     fail(error) {

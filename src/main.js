@@ -5,6 +5,8 @@
 
 import { loadAssessment } from "./data/loadAssessment.js";
 import { createApp, SCREENS } from "./state.js";
+import { loadPrefs } from "./prefs.js";
+import { getOrCreateSeed } from "./session.js";
 import { renderInstructions } from "./screens/instructions.js";
 import { renderQuiz } from "./screens/quiz.js";
 import { renderResults } from "./screens/results.js";
@@ -34,19 +36,9 @@ async function boot() {
     app.setModel(model);
     document.title = `${model.meta.capability_name} — Assessment`;
 
-    // M0 acceptance: prove the parse + flatten worked.
-    console.log("[assessment] loaded:", model.meta.capability_name);
-    console.log("[assessment] fingerprint:", model.fingerprint);
-    console.log("[assessment] counts:", model.counts);
-    console.table(
-      model.questions.map((q) => ({
-        index: q.index,
-        challenge: q.challengeNumber,
-        id: q.id,
-        type: q.type,
-        points: q.points,
-      }))
-    );
+    // Own preferences + the shuffle seed (mint-or-restore) before first render.
+    app.setPrefs(loadPrefs());
+    app.setSessionSeed(getOrCreateSeed(model.fingerprint));
 
     app.go(SCREENS.INSTRUCTIONS);
   } catch (err) {

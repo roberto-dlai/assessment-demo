@@ -12,8 +12,18 @@ the milestone plan. This repo is being built milestone by milestone.
 
 **M0 — Scaffold, data layer & infra: complete.** App shell + screen router,
 seeded PRNG/shuffle utilities, and the assessment data layer (load → validate →
-normalize → flatten, with stable item ids and a content fingerprint) are in
-place. Screens are placeholders until M1–M4.
+normalize → flatten, with stable item ids and a content fingerprint).
+
+**M1 — Instructions screen: complete.** Full instructions screen (summary,
+data-derived type legend, how-it-works), a persisted auto-advance toggle,
+session-seed ownership (mint-or-restore, fingerprint-scoped), a safe
+localStorage wrapper with in-memory fallback, and a GitHub Pages deploy
+workflow. Quiz/results remain placeholders until M2–M4.
+
+> **Deploy note:** `.github/workflows/deploy-pages.yml` is ready, but GitHub
+> Pages is not yet enabled — Pages on a **private** repo requires a paid plan.
+> Make the repo public (free Pages) or upgrade the plan to activate it. Base
+> paths are all relative and verified to work from a project subpath.
 
 ## Running locally
 
