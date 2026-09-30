@@ -118,6 +118,7 @@ body {
 
 .dl-btn {
   align-self: flex-start;
+  min-height: 44px; /* touch target aim (SPEC §9) */
 }
 
 .app__loading {
@@ -194,6 +195,10 @@ body {
 }
 .panel__badge {
   flex: none;
+  /* Override the default .dl-tag (teal-on-teal ~3.2:1) with a light tint so the
+     small badge text clears AA (SPEC §8). */
+  background: #e3f1f5;
+  color: var(--dl-teal-35);
 }
 .panel__prompt {
   margin: 0;
@@ -257,6 +262,9 @@ body {
   border-color: var(--dl-coral);
   border-width: 2px;
   font-weight: 600;
+}
+.nav-item__icon {
+  font-weight: 700; /* bolder glyph for legibility (esp. the coral ✓) */
 }
 .nav-item__icon--not-answered {
   color: var(--app-text-muted);

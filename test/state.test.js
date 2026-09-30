@@ -20,6 +20,14 @@ test("setIndex clamps to valid range", () => {
   assert.equal(app.currentIndex, 4);
 });
 
+test("setIndex is safe when there are zero questions", () => {
+  const app = createApp(() => {});
+  app.setModel({ questions: [] });
+  assert.equal(app.setIndex(0), 0);
+  assert.equal(app.setIndex(5), 0);
+  assert.equal(app.currentIndex, 0);
+});
+
 test("next/back respect bounds", () => {
   const app = appWith(3);
   assert.equal(app.currentIndex, 0);

@@ -17,10 +17,12 @@ export function announce(message, { assertive = false } = {}) {
   const region = document.getElementById(assertive ? "live-assertive" : "live-polite");
   if (!region) return;
   region.textContent = "";
-  const raf = globalThis.requestAnimationFrame || ((fn) => setTimeout(fn, 0));
-  raf(() => {
+  // setTimeout, not requestAnimationFrame: rAF is paused in background tabs, so
+  // announcements could be delayed indefinitely. The clear-then-set still forces
+  // a re-announcement of an identical string.
+  setTimeout(() => {
     region.textContent = message;
-  });
+  }, 0);
 }
 
 /**
@@ -38,8 +40,10 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function focusableWithin(container) {
+  // getClientRects() is a more robust visibility test than offsetParent, which
+  // returns null for position:fixed elements (e.g. a fixed modal/drawer).
   return Array.from(container.querySelectorAll(FOCUSABLE)).filter(
-    (elm) => elm.offsetParent !== null || elm === document.activeElement
+    (elm) => elm === document.activeElement || elm.getClientRects().length > 0
   );
 }
 
@@ -48,10 +52,12 @@ function focusableWithin(container) {
  * modal). Traps Tab within the container, closes on Escape, and restores focus
  * to the element that was focused before activation (SPEC §3.2/§3.3).
  * @param {HTMLElement} container
- * @param {{ onEscape?: () => void }} [opts]
+ * @param {{ onEscape?: () => void, focusContainer?: boolean }} [opts]
+ *   focusContainer: focus the container itself first (so a dialog's name/role is
+ *   announced) instead of its first focusable child.
  * @returns {{ activate: () => void, release: () => void }}
  */
-export function createFocusTrap(container, { onEscape } = {}) {
+export function createFocusTrap(container, { onEscape, focusContainer = false } = {}) {
   let previouslyFocused = null;
 
   function onKeydown(e) {
@@ -81,8 +87,12 @@ export function createFocusTrap(container, { onEscape } = {}) {
     activate() {
       previouslyFocused = document.activeElement;
       container.addEventListener("keydown", onKeydown);
-      const items = focusableWithin(container);
-      (items[0] || container).focus();
+      if (focusContainer) {
+        container.focus();
+      } else {
+        const items = focusableWithin(container);
+        (items[0] || container).focus();
+      }
     },
     release() {
       container.removeEventListener("keydown", onKeydown);

@@ -58,8 +58,11 @@ export function renderQuiz(root, app) {
   metaRow.append(metaLine, badge);
 
   const prompt = el("h2", "panel__prompt");
+  prompt.id = "panel-prompt";
   prompt.tabIndex = -1;
   const answerArea = el("div", "panel__answer");
+  // M3 widgets render here; label the group by the prompt so AT reads it in context.
+  answerArea.setAttribute("aria-labelledby", "panel-prompt");
 
   const panel = el("section", "panel");
   panel.append(scenarioWrap, metaRow, prompt, answerArea);
@@ -98,8 +101,10 @@ export function renderQuiz(root, app) {
       icon.setAttribute("aria-hidden", "true");
       btn.append(num, icon);
       btn.addEventListener("click", () => {
-        goTo(q.index);
+        // Close first so the trap's focus-restore doesn't override the focus
+        // that goTo() then puts on the target question's heading.
         if (isDrawerOpen()) closeDrawer();
+        goTo(q.index, { reason: "navigator" });
       });
       const li = el("li", "navigator__item");
       li.append(btn);
@@ -113,6 +118,7 @@ export function renderQuiz(root, app) {
   // ---- Assemble ----
   const backdrop = el("div", "quiz__backdrop");
   backdrop.hidden = true;
+  backdrop.setAttribute("aria-hidden", "true");
   const main = el("div", "quiz__main");
   main.append(topBar, panel, controls);
   const layout = el("div", "quiz");
@@ -155,24 +161,43 @@ export function renderQuiz(root, app) {
     nextBtn.disabled = index === total - 1;
 
     focusHeading(prompt);
-    announce(`Question ${index + 1} of ${total}. Challenge ${m.challenge}.`, { assertive: true });
   }
 
-  function goTo(index) {
+  function goTo(index, { reason = "nav" } = {}) {
     app.setIndex(index);
     showQuestion(app.currentIndex);
+    // Auto-advance (M3) owns its own assertive announcement and calls goTo with
+    // reason "auto-advance"; manual/initial navigation announces POLITELY so it
+    // doesn't fight the focus-driven heading read.
+    if (reason !== "auto-advance") {
+      const m = qMeta.get(model.questions[app.currentIndex].uid);
+      announce(`Question ${app.currentIndex + 1} of ${total}. Challenge ${m.challenge}.`);
+    }
   }
 
   // ---- Mobile drawer ----
   let trap = null;
+  // navigator already carries aria-label="Question navigator" (set at build), so
+  // it keeps an accessible name once role=dialog is applied.
+  const desktopMq = globalThis.matchMedia ? globalThis.matchMedia("(min-width: 800px)") : null;
   const isDrawerOpen = () => navigator.classList.contains("navigator--open");
+  function onDesktopChange(e) {
+    // Force-close if the viewport grows to desktop while the drawer is open, so
+    // dialog/modal/trap state can't leak onto the sidebar layout.
+    if (e.matches && isDrawerOpen()) closeDrawer();
+  }
   function openDrawer() {
     navigator.classList.add("navigator--open");
     navigator.setAttribute("role", "dialog");
     navigator.setAttribute("aria-modal", "true");
+    navigator.tabIndex = -1; // so the dialog container can take initial focus
     backdrop.hidden = false;
     navToggle.setAttribute("aria-expanded", "true");
-    trap = createFocusTrap(navigator, { onEscape: closeDrawer });
+    document.body.style.overflow = "hidden"; // scroll lock behind the modal
+    if (desktopMq && desktopMq.addEventListener) desktopMq.addEventListener("change", onDesktopChange);
+    // Focus the container first so the dialog's name/role is announced before the
+    // learner tabs into a grid of question buttons.
+    trap = createFocusTrap(navigator, { onEscape: closeDrawer, focusContainer: true });
     trap.activate();
   }
   function closeDrawer() {
@@ -181,6 +206,8 @@ export function renderQuiz(root, app) {
     navigator.removeAttribute("aria-modal");
     backdrop.hidden = true;
     navToggle.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+    if (desktopMq && desktopMq.removeEventListener) desktopMq.removeEventListener("change", onDesktopChange);
     if (trap) {
       trap.release();
       trap = null;
@@ -190,13 +217,13 @@ export function renderQuiz(root, app) {
   backdrop.addEventListener("click", closeDrawer);
 
   // ---- Wire controls ----
-  backBtn.addEventListener("click", () => goTo(app.currentIndex - 1));
-  nextBtn.addEventListener("click", () => goTo(app.currentIndex + 1));
+  backBtn.addEventListener("click", () => goTo(app.currentIndex - 1, { reason: "nav" }));
+  nextBtn.addEventListener("click", () => goTo(app.currentIndex + 1, { reason: "nav" }));
   submitBtn.addEventListener("click", () => app.go(SCREENS.RESULTS));
 
   // ---- Initial paint ----
   refreshAllNav();
-  showQuestion(app.currentIndex);
+  goTo(app.currentIndex, { reason: "initial" });
 }
 
 function ctlButton(text, variant) {

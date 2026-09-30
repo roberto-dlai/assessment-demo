@@ -41,6 +41,8 @@ export function createApp(onChange) {
     answers: new Map(),
     /** @type {Set<string>} uids the learner has interacted with (SPEC §6) */
     interacted: new Set(),
+    /** @type {Set<string>} uids that already auto-advanced once (SPEC §4.6; M3 wires it) */
+    hasAutoAdvanced: new Set(),
     /** @type {Map<string, string[]>} uid -> resolved shuffle order of item ids (M3) */
     resolvedOrderings: new Map(),
     /** @type {boolean} */
@@ -65,7 +67,7 @@ export function createApp(onChange) {
     /** @param {number} i @returns {number} the clamped index actually set */
     setIndex(i) {
       const n = this.model ? this.model.questions.length : 0;
-      this.currentIndex = Math.max(0, Math.min(i, n - 1));
+      this.currentIndex = n === 0 ? 0 : Math.max(0, Math.min(i, n - 1));
       return this.currentIndex;
     },
     next() {
