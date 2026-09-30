@@ -1,0 +1,11 @@
+{
+  "name": "assessment-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Static web-based assessment tool (DeepLearning.AI-branded).",
+  "scripts": {
+    "test": "node --test",
+    "serve": "npx --yes serve ."
+  }
+}
