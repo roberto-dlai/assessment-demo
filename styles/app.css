@@ -267,7 +267,7 @@ body {
   min-height: 44px;
   padding: 0.4rem 0.8rem;
   border: 1px solid #bbb;
-  border-radius: 999px;
+  border-radius: 8px; /* boxy, matching the group target boxes */
   background: var(--dl-white);
   font: inherit;
   cursor: pointer;
@@ -289,7 +289,7 @@ body {
   min-width: 2rem;
   min-height: 44px;
   border: 1px solid #bbb;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--dl-white);
   color: var(--app-text-muted);
   font: inherit;
