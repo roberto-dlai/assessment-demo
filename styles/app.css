@@ -242,6 +242,13 @@ body {
   flex-basis: 100%;
   background: #fafafa;
 }
+/* Grouping group boxes are drop targets — the whole box is clickable */
+.bins .bin {
+  cursor: pointer;
+}
+.bins .bin:hover {
+  border-color: var(--dl-teal);
+}
 .bin__target {
   width: 100%;
   text-align: left;

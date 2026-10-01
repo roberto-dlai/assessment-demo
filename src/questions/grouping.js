@@ -84,6 +84,13 @@ export function render(container, { question, app, rng, onChange, announce }) {
   function makeGroupBin(group) {
     const sec = el("section", "bin");
     sec.setAttribute("aria-label", `Group: ${group}`);
+    // Clicking anywhere on the box places the selected item. Clicks that land on
+    // an inner button (a placed chip, its ×, or the title) are handled by that
+    // button instead, so selecting/removing a placed item still works.
+    sec.addEventListener("click", (e) => {
+      if (e.target.closest("button")) return;
+      placeInto(group);
+    });
     const target = el("button", "bin__target", group);
     target.type = "button";
     target.setAttribute("aria-label", `Place the selected item in ${group}`);
