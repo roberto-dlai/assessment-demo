@@ -1,47 +1,98 @@
 // grouping widget (SPEC §4, §5, §6).
-// Accessible baseline: one labelled <select> per item to choose its group
-// (pool/bins drag UI is a future enhancement). Group names come from the data.
+// Pool + bins, click-to-place (two-step, no native drag so it stays keyboard-
+// and touch-operable): select an item chip, then click a group's target to place
+// it. Items live in the "Unplaced" pool or in a group bin.
 // Answer payload: { [itemId]: groupName } (JSON-plain); absent key = unplaced.
 
 import { el } from "../screens/dom.js";
 import { shuffle } from "../util/shuffle.js";
 
 export const noun = "grouping";
+const POOL = "__pool__";
 
 export function render(container, { question, app, rng, onChange, announce }) {
   const uid = question.uid;
   const current = { ...(app.answers.get(uid) || {}) };
+  const byId = new Map(question.items.map((it) => [it.id, it]));
+  const display = shuffle(question.items, rng); // stable pool order
+  let selectedId = null;
+  let itemRefs = new Map();
 
-  const wrap = el("div", "assign");
-  for (const it of shuffle(question.items, rng)) {
-    const row = el("div", "assign__row");
-    const selId = `grp-${uid}-${it.id}`;
-    const label = el("label", "assign__label", it.label);
-    label.setAttribute("for", selId);
+  const root = el("div", "pickplace");
+  root.append(el("p", "pickplace__hint", "Select an item, then choose a group to place it in."));
+  const bins = el("div", "bins");
+  root.append(bins);
 
-    const sel = el("select", "assign__select");
-    sel.id = selId;
-    const none = el("option", null, "— choose group —");
-    none.value = "";
-    sel.append(none);
-    for (const g of question.groupNames) {
-      const o = el("option", null, g);
-      o.value = g;
-      if (current[it.id] === g) o.selected = true;
-      sel.append(o);
-    }
-    sel.addEventListener("change", () => {
-      if (sel.value) current[it.id] = sel.value;
-      else delete current[it.id];
-      app.setAnswer(uid, { ...current });
-      announce(`${Object.keys(current).length} of ${question.items.length} placed.`);
-      onChange();
-    });
+  const itemsIn = (group) => display.filter((it) => (current[it.id] || POOL) === group);
 
-    row.append(label, sel);
-    wrap.append(row);
+  function selectItem(id) {
+    selectedId = selectedId === id ? null : id;
+    paint();
+    if (selectedId) announce(`Selected "${byId.get(id).label}". Choose a group.`);
+    focusItem(id);
   }
-  container.append(wrap);
+
+  function placeInto(group) {
+    if (!selectedId) {
+      announce("Select an item first.");
+      return;
+    }
+    const movedId = selectedId;
+    const label = byId.get(movedId).label;
+    if (group === POOL) delete current[movedId];
+    else current[movedId] = group;
+    selectedId = null;
+    app.setAnswer(uid, { ...current });
+    paint();
+    const placed = Object.keys(current).length;
+    announce(
+      group === POOL
+        ? `Returned "${label}" to unplaced.`
+        : `Placed "${label}" in ${group}. ${placed} of ${question.items.length} placed.`
+    );
+    onChange();
+    focusItem(movedId);
+  }
+
+  function focusItem(id) {
+    const b = itemRefs.get(id);
+    if (b) b.focus();
+  }
+
+  function makeBin(group, title, isPool) {
+    const sec = el("section", isPool ? "bin bin--pool" : "bin");
+    sec.setAttribute("aria-label", isPool ? "Unplaced items" : `Group: ${title}`);
+    const target = el("button", "bin__target", title);
+    target.type = "button";
+    target.setAttribute(
+      "aria-label",
+      isPool ? "Move the selected item to unplaced" : `Place the selected item in ${title}`
+    );
+    target.addEventListener("click", () => placeInto(group));
+    const list = el("ul", "bin__items");
+    for (const it of itemsIn(group)) {
+      const li = el("li", "bin__item");
+      const chip = el("button", selectedId === it.id ? "chip chip--selected" : "chip", it.label);
+      chip.type = "button";
+      chip.setAttribute("aria-pressed", selectedId === it.id ? "true" : "false");
+      chip.addEventListener("click", () => selectItem(it.id));
+      itemRefs.set(it.id, chip);
+      li.append(chip);
+      list.append(li);
+    }
+    sec.append(target, list);
+    return sec;
+  }
+
+  function paint() {
+    itemRefs = new Map();
+    bins.innerHTML = "";
+    bins.append(makeBin(POOL, "Unplaced", true));
+    for (const g of question.groupNames) bins.append(makeBin(g, g, false));
+  }
+
+  paint();
+  container.append(root);
 }
 
 /** @param {object|undefined} answer */

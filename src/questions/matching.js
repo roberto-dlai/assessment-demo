@@ -1,7 +1,9 @@
 // matching widget (SPEC §4, §5, §6).
-// Accessible baseline: one labelled <select> per left row choosing a right value
-// (drag is a future enhancement). Right values are one-to-one: a value chosen in
-// one row is disabled in the others. Auto-matches the final pair.
+// Pool of right values + one slot per left item, click-to-place (two-step, no
+// native drag). Select a value from the pool, then click a left item's slot to
+// match it. Click a filled slot (with nothing selected) to pick its value back
+// up. Right values are one-to-one: placing into an occupied slot returns the
+// previous value to the pool. Auto-matches the final pair.
 // Answer payload: { [leftId]: rightId } (JSON-plain).
 
 import { el } from "../screens/dom.js";
@@ -12,75 +14,137 @@ export const noun = "matching";
 export function render(container, { question, app, rng, onChange, announce }) {
   const uid = question.uid;
   const current = { ...(app.answers.get(uid) || {}) };
-  const rights = shuffle(question.rights, rng);
-  const rightLabel = new Map(question.rights.map((r) => [r.id, r.label]));
-  const selects = new Map(); // leftId -> <select>
+  const rLabel = new Map(question.rights.map((r) => [r.id, r.label]));
+  const lLabel = new Map(question.lefts.map((l) => [l.id, l.label]));
+  const display = shuffle(question.rights, rng); // stable pool order
+  let carried = null; // rightId currently selected
+  let chipRefs = new Map();
+  let slotRefs = new Map();
 
-  function refreshDisabled() {
-    for (const [leftId, sel] of selects) {
-      const usedElsewhere = new Set(
-        Object.entries(current)
-          .filter(([l, r]) => l !== leftId && r)
-          .map(([, r]) => r)
-      );
-      for (const opt of sel.options) {
-        if (opt.value) opt.disabled = usedElsewhere.has(opt.value) && opt.value !== current[leftId];
-      }
-    }
+  const root = el("div", "pickplace");
+  root.append(
+    el(
+      "p",
+      "pickplace__hint",
+      "Select a value, then choose the item it matches. Select a filled match to pick it up again."
+    )
+  );
+  const pool = el("div", "bin bin--pool");
+  const slots = el("ul", "slots");
+  root.append(pool, slots);
+
+  const assigned = () => new Set(Object.values(current).filter(Boolean));
+  const poolRights = () => {
+    const used = assigned();
+    return display.filter((r) => !used.has(r.id));
+  };
+
+  function selectRight(id) {
+    carried = carried === id ? null : id;
+    paint();
+    if (carried) announce(`Selected "${rLabel.get(id)}". Choose an item to match.`);
+    const b = chipRefs.get(id);
+    if (b) b.focus();
   }
 
-  // Fires only on a forward assignment that leaves exactly one left + one right open.
+  // Auto-match the last pair, only after a forward assignment leaves one open.
   function maybeAutoMatch() {
     const openLefts = question.lefts.filter((l) => !current[l.id]);
-    const usedRights = new Set(Object.values(current).filter(Boolean));
-    const freeRights = question.rights.filter((r) => !usedRights.has(r.id));
-    if (openLefts.length === 1 && freeRights.length === 1) {
-      const l = openLefts[0];
-      const r = freeRights[0];
-      current[l.id] = r.id;
-      const sel = selects.get(l.id);
-      if (sel) sel.value = r.id;
-      announce(`Last pair matched automatically: ${l.label} with ${rightLabel.get(r.id)}.`);
+    const free = poolRights();
+    if (openLefts.length === 1 && free.length === 1) {
+      current[openLefts[0].id] = free[0].id;
+      announce(`Last pair matched automatically: ${openLefts[0].label} with ${rLabel.get(free[0].id)}.`);
     }
   }
 
-  const wrap = el("div", "assign");
-  for (const left of question.lefts) {
-    const row = el("div", "assign__row");
-    const selId = `mat-${uid}-${left.id}`;
-    const label = el("label", "assign__label", left.label);
-    label.setAttribute("for", selId);
-
-    const sel = el("select", "assign__select");
-    sel.id = selId;
-    const none = el("option", null, "— choose match —");
-    none.value = "";
-    sel.append(none);
-    for (const r of rights) {
-      const o = el("option", null, r.label);
-      o.value = r.id;
-      if (current[left.id] === r.id) o.selected = true;
-      sel.append(o);
-    }
-    sel.addEventListener("change", () => {
-      if (sel.value) {
-        current[left.id] = sel.value;
-        maybeAutoMatch(); // only on forward assignment, never on clear
-      } else {
-        delete current[left.id];
-      }
+  function clickLeft(leftId) {
+    if (carried) {
+      // place (an occupant, if any, drops back to the pool implicitly)
+      current[leftId] = carried;
+      const label = rLabel.get(carried);
+      carried = null;
+      maybeAutoMatch();
       app.setAnswer(uid, { ...current });
-      refreshDisabled();
+      paint();
+      announce(`Matched ${lLabel.get(leftId)} with "${label}".`);
       onChange();
-    });
-
-    selects.set(left.id, sel);
-    row.append(label, sel);
-    wrap.append(row);
+      const b = slotRefs.get(leftId);
+      if (b) b.focus();
+    } else if (current[leftId]) {
+      // pick the occupant back up
+      carried = current[leftId];
+      delete current[leftId];
+      app.setAnswer(uid, { ...current });
+      paint();
+      announce(`Picked up "${rLabel.get(carried)}" from ${lLabel.get(leftId)}.`);
+      onChange();
+      const b = chipRefs.get(carried);
+      if (b) b.focus();
+    } else {
+      announce("Select a value first.");
+    }
   }
 
-  refreshDisabled();
-  container.append(wrap);
+  function returnToPool() {
+    if (!carried) {
+      announce("Select a matched value to move it back.");
+      return;
+    }
+    const label = rLabel.get(carried);
+    carried = null;
+    paint();
+    announce(`Returned "${label}" to the pool.`);
+  }
+
+  function paint() {
+    chipRefs = new Map();
+    slotRefs = new Map();
+
+    pool.innerHTML = "";
+    pool.setAttribute("aria-label", "Values to match");
+    const poolTarget = el("button", "bin__target", "Values");
+    poolTarget.type = "button";
+    poolTarget.setAttribute("aria-label", "Return the selected value to the pool");
+    poolTarget.addEventListener("click", returnToPool);
+    const poolList = el("ul", "bin__items");
+    for (const r of poolRights()) {
+      const li = el("li", "bin__item");
+      const chip = el("button", carried === r.id ? "chip chip--selected" : "chip", r.label);
+      chip.type = "button";
+      chip.setAttribute("aria-pressed", carried === r.id ? "true" : "false");
+      chip.addEventListener("click", () => selectRight(r.id));
+      chipRefs.set(r.id, chip);
+      li.append(chip);
+      poolList.append(li);
+    }
+    pool.append(poolTarget, poolList);
+
+    slots.innerHTML = "";
+    for (const left of question.lefts) {
+      const li = el("li", "slot");
+      const label = el("span", "slot__label", left.label);
+      const filled = current[left.id];
+      const target = el(
+        "button",
+        filled ? "slot__target slot__target--filled" : "slot__target",
+        filled ? rLabel.get(filled) : "— choose match —"
+      );
+      target.type = "button";
+      target.setAttribute(
+        "aria-label",
+        filled
+          ? `${left.label}: matched with ${rLabel.get(filled)}. Select to pick it up.`
+          : `${left.label}: choose a match`
+      );
+      target.addEventListener("click", () => clickLeft(left.id));
+      slotRefs.set(left.id, target);
+      li.append(label, target);
+      slots.append(li);
+    }
+  }
+
+  paint();
+  container.append(root);
 }
 
 /** @param {object|undefined} answer */

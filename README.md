@@ -29,11 +29,11 @@ challenge, roving tabindex, status icons, jump-to), and a progress indicator.
 through a lazy mount-once-and-cache widget lifecycle in the quiz screen
 (answers rehydrate from `app.answers` on revisit). All five types are
 interactive: single/multi-select (radios/checkboxes), grouping and matching
-(accessible labelled selects; matching enforces one-to-one and auto-matches the
-final pair), and ordering (move up/down). Per-type status (not-answered /
+(pool + bins/slots with accessible click-to-select-then-place — no native drag,
+so it's keyboard- and touch-operable; matching is one-to-one and auto-matches
+the final pair), and ordering (move up/down). Per-type status (not-answered /
 in-progress / answered) and partial-credit scoring are implemented and unit
-tested. Drag-and-drop is a future enhancement over the accessible baseline;
-score aggregation + the results screen land in M4.
+tested. Score aggregation + the results screen land in M4.
 
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`).
