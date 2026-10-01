@@ -494,7 +494,7 @@ body {
   color: var(--dl-teal);
 }
 .nav-item__icon--answered {
-  color: var(--dl-coral);
+  color: var(--dl-teal);
 }
 
 /* Accessibility helpers */
