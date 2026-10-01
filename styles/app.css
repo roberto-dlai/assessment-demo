@@ -278,6 +278,29 @@ body {
   background: #fdecee;
   font-weight: 600;
 }
+/* Placed chip + its remove (×) button */
+.placed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.chip__remove {
+  flex: none;
+  min-width: 2rem;
+  min-height: 44px;
+  border: 1px solid #bbb;
+  border-radius: 999px;
+  background: var(--dl-white);
+  color: var(--app-text-muted);
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.chip__remove:hover {
+  border-color: var(--dl-magenta);
+  color: var(--dl-magenta);
+}
 
 /* Matching slots */
 .slots {

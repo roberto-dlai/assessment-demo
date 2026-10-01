@@ -56,6 +56,17 @@ export function render(container, { question, app, rng, onChange, announce }) {
     focusItem(movedId);
   }
 
+  function removeItem(id) {
+    const label = byId.get(id).label;
+    delete current[id];
+    if (selectedId === id) selectedId = null;
+    app.setAnswer(uid, { ...current });
+    paint();
+    announce(`Removed "${label}" from its group.`);
+    onChange();
+    focusItem(id); // focus the chip, now back in the pool
+  }
+
   function focusItem(id) {
     const b = itemRefs.get(id);
     if (b) b.focus();
@@ -80,7 +91,14 @@ export function render(container, { question, app, rng, onChange, announce }) {
     const list = el("ul", "bin__items");
     for (const it of itemsIn(group)) {
       const li = el("li", "bin__item");
-      li.append(makeChip(it));
+      const holder = el("span", "placed");
+      holder.append(makeChip(it));
+      const remove = el("button", "chip__remove", "×");
+      remove.type = "button";
+      remove.setAttribute("aria-label", `Remove "${it.label}" from ${group}`);
+      remove.addEventListener("click", () => removeItem(it.id));
+      holder.append(remove);
+      li.append(holder);
       list.append(li);
     }
     sec.append(target, list);
