@@ -1,9 +1,12 @@
 // App state + screen routing (SPEC §3 flow).
 //
 // Holds the loaded model, the current screen, and in-quiz answer state. Per-type
-// status is delegated to the question registry; persistence arrives in M5.
+// status is delegated to the question registry. In-quiz mutations auto-save via
+// `persist` (wired by main.js, SPEC §7); serialize/hydrate bridge the in-memory
+// Maps/Sets to the JSON-plain blob.
 
 import { widgetFor } from "./questions/registry.js";
+import { grade } from "./scoring.js";
 
 export const SCREENS = Object.freeze({
   INSTRUCTIONS: "instructions",
@@ -46,6 +49,34 @@ export function createApp(onChange) {
     submitted: false,
     /** @type {object|null} computed results (M4) */
     results: null,
+    /** @type {((app) => void)|null} persistence hook, set by main.js (SPEC §7) */
+    persist: null,
+
+    /** Save in-quiz state through the persistence hook, if wired. */
+    _save() {
+      if (this.persist) this.persist(this);
+    },
+    /** @returns {object} JSON-plain blob of in-quiz state (SPEC §7) */
+    serialize() {
+      return {
+        answers: Object.fromEntries(this.answers),
+        interacted: [...this.interacted],
+        resolvedOrderings: Object.fromEntries(this.resolvedOrderings),
+        currentIndex: this.currentIndex,
+        submitted: this.submitted,
+      };
+    },
+    /** Restore in-quiz state from a stored blob (no save; results recomputed). */
+    hydrate(blob) {
+      if (!blob) return this;
+      this.answers = new Map(Object.entries(blob.answers || {}));
+      this.interacted = new Set(blob.interacted || []);
+      this.resolvedOrderings = new Map(Object.entries(blob.resolvedOrderings || {}));
+      this.currentIndex = blob.currentIndex || 0;
+      this.submitted = Boolean(blob.submitted);
+      this.results = this.submitted && this.model ? grade(this) : null;
+      return this;
+    },
 
     setModel(model) {
       this.model = model;
@@ -61,6 +92,7 @@ export function createApp(onChange) {
     setIndex(i) {
       const n = this.model ? this.model.questions.length : 0;
       this.currentIndex = n === 0 ? 0 : Math.max(0, Math.min(i, n - 1));
+      this._save();
       return this.currentIndex;
     },
     next() {
@@ -77,14 +109,17 @@ export function createApp(onChange) {
     setAnswer(uid, payload) {
       this.answers.set(uid, payload);
       this.interacted.add(uid);
+      this._save();
       return this;
     },
     markInteracted(uid) {
       this.interacted.add(uid);
+      this._save();
       return this;
     },
     setResolvedOrdering(uid, itemIds) {
       this.resolvedOrderings.set(uid, itemIds);
+      this._save();
       return this;
     },
 
@@ -110,6 +145,7 @@ export function createApp(onChange) {
     submit(results) {
       this.results = results;
       this.submitted = true;
+      this._save(); // persist submitted so a reload returns to results (SPEC §7)
       return this.go(SCREENS.RESULTS);
     },
     /** Clear in-quiz state for a fresh attempt (Retake). */

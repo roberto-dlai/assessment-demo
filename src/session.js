@@ -36,6 +36,15 @@ export function getOrCreateSeed(fingerprint) {
 }
 
 /**
+ * Persist the session BLOB for an assessment (SPEC §7). Stamps the schemaVersion.
+ * @param {string} fingerprint
+ * @param {object} data - JSON-plain in-quiz state (from app.serialize())
+ */
+export function saveSession(fingerprint, data) {
+  setJSON(blobKey(fingerprint), { schemaVersion: BLOB_VERSION, ...data });
+}
+
+/**
  * Load the stored session BLOB (M5 answer state), if present and schema-compatible.
  * @param {string} fingerprint
  * @returns {object|null}

@@ -42,8 +42,16 @@ Escape/backdrop to cancel). On confirm, `scoring.js` grades every question
 per-challenge subtotals, and the results screen shows a score summary plus a
 per-question review (your answer, the canonical correct answer, and outcome as
 shape+label — ✓ correct / ◐ partial / ✕ incorrect / ○ not answered). Retake
-clears state and returns to the start. Persistence of progress/results across
-reloads is M5.
+clears state and returns to the start.
+
+**M5 — Persistence: complete.** In-quiz state (answers, interacted, resolved
+orderings, current index, submitted) auto-saves to `localStorage` on every
+change, in a blob namespaced by the content fingerprint (seed in its own key).
+On load, a session with real progress restores and the instructions screen
+offers Resume / Start over; a submitted session reloads straight to results.
+Retake / Start over clear storage. Falls back to in-memory with a notice when
+`localStorage` is unavailable; stale blobs are discarded on
+fingerprint/schemaVersion mismatch.
 
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`).

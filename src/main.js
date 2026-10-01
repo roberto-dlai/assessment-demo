@@ -1,11 +1,11 @@
 // App bootstrap + screen router (SPEC §9).
 //
-// M0 deliverable: load the assessment from a relative path, log the parsed +
-// flattened model, and route between the (placeholder) screens.
+// Loads the assessment, restores any saved session (SPEC §7), wires auto-save,
+// and routes between screens.
 
 import { loadAssessment } from "./data/loadAssessment.js";
 import { createApp, SCREENS } from "./state.js";
-import { getOrCreateSeed } from "./session.js";
+import { getOrCreateSeed, loadSession, saveSession, hasSavedProgress } from "./session.js";
 import { renderInstructions } from "./screens/instructions.js";
 import { renderQuiz } from "./screens/quiz.js";
 import { renderResults } from "./screens/results.js";
@@ -38,7 +38,15 @@ async function boot() {
     // Own the shuffle seed (mint-or-restore) before first render.
     app.setSessionSeed(getOrCreateSeed(model.fingerprint));
 
-    app.go(SCREENS.INSTRUCTIONS);
+    // Restore a saved session only if it has real progress (so an index-only
+    // save from idle navigation doesn't drop a fresh start mid-quiz). Enable
+    // auto-save AFTER hydrate so restoring doesn't immediately re-save.
+    if (hasSavedProgress(model.fingerprint)) app.hydrate(loadSession(model.fingerprint));
+    app.persist = (a) => saveSession(model.fingerprint, a.serialize());
+
+    // A submitted session reloads straight to results; otherwise the instructions
+    // screen offers Resume/Start-over when there's saved progress (SPEC §7/§3.1).
+    app.go(app.submitted ? SCREENS.RESULTS : SCREENS.INSTRUCTIONS);
   } catch (err) {
     console.error("[assessment] failed to load:", err);
     app.fail(err);
