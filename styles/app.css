@@ -235,10 +235,10 @@ body {
   padding-left: 0.4rem;
 }
 .navigator__group-title {
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.3rem;
   color: var(--app-text-muted);
   white-space: nowrap;
 }
@@ -247,8 +247,8 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: nowrap;
-  gap: 0.2rem;
+  flex-wrap: wrap; /* last-resort wrap so buttons never overflow/clip at very narrow widths */
+  gap: 0.3rem;
 }
 .navigator__item {
   flex: 1 1 0; /* each list item grows so its button fills the group width */
@@ -262,26 +262,26 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.05rem;
-  min-width: 1.65rem;
-  min-height: 2rem; /* ~32px tall; ~26px wide — above the 24px AA minimum so all 18 fit in one row */
-  padding: 0.1rem 0.2rem;
+  min-width: 1.65rem; /* floor for narrow screens; buttons stretch wider on desktop */
+  min-height: 2.6rem; /* ~42px tall — comfortable target + room for the stacked icon/number */
+  padding: 0.25rem 0.2rem;
   border: 1px solid #ddd;
   border-radius: 6px;
   background: var(--dl-white);
   font: inherit;
-  font-size: 0.7rem;
-  line-height: 1.1;
+  font-size: 0.8rem;
+  line-height: 1.15;
   cursor: pointer;
 }
 .nav-item--active {
   border-color: var(--dl-coral);
-  border-width: 2px;
   font-weight: 600;
-  background: #fdecee; /* light coral tint so the active item is unambiguous */
+  background: #fdecee; /* light coral tint (no coral-tint token exists in theme.css) */
+  box-shadow: inset 0 0 0 2px var(--dl-coral); /* 2px ring with no layout shift (vs changing border-width) */
 }
 .nav-item__icon {
   font-weight: 700; /* bolder glyph for legibility (esp. the coral ✓) */
-  font-size: 0.85em;
+  font-size: 1em; /* at least as large as the number so ○ / ◐ / ✓ stay distinguishable */
 }
 .nav-item__icon--not-answered {
   color: var(--app-text-muted);

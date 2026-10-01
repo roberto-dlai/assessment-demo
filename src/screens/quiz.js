@@ -85,6 +85,9 @@ export function renderQuiz(root, app) {
   for (const ch of model.challenges) {
     if (ch.questions.length === 0) continue; // §10: empty challenge skipped
     const group = el("div", "navigator__group");
+    // Grow proportionally to the question count so buttons stay a uniform width
+    // even when challenges have different numbers of questions.
+    group.style.flexGrow = String(ch.questions.length);
     group.append(el("h3", "navigator__group-title", `Challenge ${ch.challenge_number}`));
     const ul = el("ul", "navigator__list");
     ch.questions.forEach((q, i) => {
