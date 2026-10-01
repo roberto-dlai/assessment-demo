@@ -170,7 +170,7 @@ A question counts as **correct** in results when `questionScore === 1`, **partia
 
 ## 6. Question status states
 
-Each question tracks an explicit **`interacted` boolean**, stored separately from the answer payload. Status is derived from `interacted` + completeness — never inferred from the payload alone (so an ordering question returned to its shuffled start, or a cleared selection, reads correctly).
+Status is derived from the answer payload via the per-type `statusOf`: **not-answered** when there's no substantive answer, **in-progress** when a compound type is partially complete, **answered** when complete. (An unanswered question has no stored answer; a fully-cleared compound answer reads not-answered.)
 
 Every state is conveyed by **shape + text label**, not color alone (color is secondary reinforcement). Shapes must be distinguishable in greyscale — hollow vs. half vs. full:
 
@@ -189,7 +189,7 @@ Every state is conveyed by **shape + text label**, not color alone (color is sec
 ## 7. Persistence
 
 - Store to `localStorage` under a key namespaced by an **assessment content fingerprint** — a hash of the challenges' question `id`s, `type`s, and option/item text — **not** by title or question count (which collide and miss content drift). Stored blob carries an explicit `schemaVersion`.
-- Blob contents: per-question answers, per-question `interacted` flags, the session seed **and the resolved post-reshuffle orderings**, current question index, results, and a `submitted` flag.
+- Blob contents: per-question answers, the resolved post-reshuffle orderings, current question index, and a `submitted` flag. The session seed lives in its own key; results are recomputed from the answers on restore.
 - On load: if state exists for this fingerprint, offer Resume; otherwise start fresh.
 - Persisting the resolved orderings (not just the seed) guarantees restore reproduces the exact layout and never conflicts with the reshuffle-if-equal rule (§2.5).
 - On **Submit**, persist results + `submitted: true` so a reload returns to the results screen.
@@ -246,9 +246,9 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 
 1. All five types render, accept input, and grade per §5.
 2. Back/Next and the challenge-grouped navigator allow reaching any question in any order.
-3. Each question shows its point value and a live status icon conveyed by **shape + text label** (not color alone), driven by the `interacted` flag (§6).
+3. Each question shows its point value and a live status icon conveyed by **shape + text label** (not color alone), derived from the answer payload (§6).
 4. Matching auto-matches the final pair **only on a forward assignment leaving one pair** and grades the result normally (§4).
-5. Progress, `interacted` flags, and the resolved shuffle orderings survive reload; results survive reload after submit; state is discarded on fingerprint/`schemaVersion` mismatch and degrades gracefully when `localStorage` is unavailable.
+5. Progress (answers + index) and the resolved shuffle orderings survive reload; a submitted session reloads to results; state is discarded on fingerprint/`schemaVersion` mismatch and degrades gracefully when `localStorage` is unavailable.
 6. Results show correct/partial/incorrect (shape + label), points, and the **canonical** correct solution for every question.
 7. Instructions screen renders from the assessment-level fields.
 8. UI passes WCAG 2.1 AA: contrast (incl. point chip and all outcome/status signals), full keyboard operation, focus management for the submit modal and navigator (roving tabindex), `aria-live` announcements, and click-to-assign as the accessible baseline with ≥24px targets. Works on mobile.

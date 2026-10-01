@@ -107,15 +107,18 @@ test("loadSession ignores incompatible schema versions", () => {
 test("hasSavedProgress reflects the session blob's answers/submitted, not the seed", () => {
   getOrCreateSeed("fp-Y");
   assert.equal(hasSavedProgress("fp-Y"), false);
-  // Simulate an M5 blob with progress.
-  setJSON("assessment:session:fp-Y", { schemaVersion: 1, answers: { "q0": {} } });
+  // Simulate an M5 blob with a substantive answer.
+  setJSON("assessment:session:fp-Y", { schemaVersion: 1, answers: { q0: "optA" } });
   assert.equal(hasSavedProgress("fp-Y"), true);
   setJSON("assessment:session:fp-Y", { schemaVersion: 1, answers: {}, submitted: true });
   assert.equal(hasSavedProgress("fp-Y"), true);
+  // An empty-payload answer is NOT resumable progress.
+  setJSON("assessment:session:fp-Y", { schemaVersion: 1, answers: { q0: {} } });
+  assert.equal(hasSavedProgress("fp-Y"), false);
 });
 
 test("startFresh clears the session blob and re-mints a seed", () => {
-  setJSON("assessment:session:fp-Z", { schemaVersion: 1, answers: { "q0": {} } });
+  setJSON("assessment:session:fp-Z", { schemaVersion: 1, answers: { q0: "optA" } });
   assert.equal(hasSavedProgress("fp-Z"), true);
   const seed = startFresh("fp-Z");
   assert.ok(Number.isInteger(seed));

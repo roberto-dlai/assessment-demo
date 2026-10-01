@@ -2,7 +2,7 @@
 
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
-import { focusHeading } from "../util/a11y.js";
+import { focusHeading, announce } from "../util/a11y.js";
 import { hasSavedProgress, startFresh } from "../session.js";
 import { isPersistent } from "../util/storage.js";
 
@@ -16,27 +16,33 @@ const TYPE_LABELS = {
 
 export function renderInstructions(root, app) {
   const { meta, counts } = app.model;
+  const persistent = isPersistent();
   const section = mountScreen(root, "instructions");
 
   const h1 = heading(meta.capability_name);
   section.append(h1, metaLine(meta));
   if (meta.lead_scenario) section.append(el("p", "screen__lead", meta.lead_scenario));
 
-  section.append(summary(counts), typeLegend(app.model), howItWorks(), actions(root, app));
+  section.append(summary(counts), typeLegend(app.model), howItWorks(persistent));
 
-  if (!isPersistent()) {
+  // Caveat goes ABOVE the actions so it's seen/heard before the learner commits.
+  if (!persistent) {
     const notice = el(
       "p",
       "screen__notice",
-      "Heads up: your browser isn't saving progress, so it won't survive a page reload."
+      "Heads up — this browser won't save your progress, so it won't survive a reload."
     );
     notice.setAttribute("role", "note");
     section.append(notice);
   }
+  section.append(actions(root, app));
 
   // Moving focus to the h1 makes the screen reader announce the title; a
   // separate announcement here would double-speak, so we rely on focus alone.
   focusHeading(h1);
+  if (!persistent) {
+    announce("This browser won't save your progress, so it won't survive a reload.");
+  }
 }
 
 function metaLine(meta) {
@@ -77,17 +83,19 @@ function typeLegend(model) {
   return wrap;
 }
 
-function howItWorks() {
+function howItWorks(persistent) {
   const wrap = labelledSection("howto", "How it works", "howto-heading");
   const list = el("ul", "howto__list");
-  for (const note of [
+  const notes = [
     "Move freely between questions — use Back, Next, or the question navigator to jump to any question.",
-    "Your progress is saved automatically and survives a page reload.",
+    // Only promise reload-safety when storage actually works (the notice covers the other case).
+    persistent
+      ? "Your progress is saved automatically and survives a page reload."
+      : "Your answers are kept as you work through the assessment.",
     "You can change any answer until you submit.",
     "Each question shows how many points it is worth.",
-  ]) {
-    list.append(el("li", "", note));
-  }
+  ];
+  for (const note of notes) list.append(el("li", "", note));
   wrap.append(list);
   return wrap;
 }
@@ -102,6 +110,8 @@ function actions(root, app) {
     const startOver = secondaryButton("Start over", () => {
       app.reset(); // clear in-memory answers/index/results
       app.setSessionSeed(startFresh(fingerprint)); // clear storage + mint a new seed
+      // assertive region so it isn't clobbered by the quiz's polite "Question 1…"
+      announce("Progress cleared. Starting over.", { assertive: true });
       app.go(SCREENS.QUIZ);
     });
     wrap.append(resume, startOver);

@@ -41,8 +41,6 @@ export function createApp(onChange) {
     currentIndex: 0,
     /** @type {Map<string, any>} uid -> answer payload (M3) */
     answers: new Map(),
-    /** @type {Set<string>} uids the learner has interacted with (SPEC §6) */
-    interacted: new Set(),
     /** @type {Map<string, string[]>} uid -> resolved shuffle order of item ids (M3) */
     resolvedOrderings: new Map(),
     /** @type {boolean} */
@@ -60,7 +58,6 @@ export function createApp(onChange) {
     serialize() {
       return {
         answers: Object.fromEntries(this.answers),
-        interacted: [...this.interacted],
         resolvedOrderings: Object.fromEntries(this.resolvedOrderings),
         currentIndex: this.currentIndex,
         submitted: this.submitted,
@@ -70,7 +67,6 @@ export function createApp(onChange) {
     hydrate(blob) {
       if (!blob) return this;
       this.answers = new Map(Object.entries(blob.answers || {}));
-      this.interacted = new Set(blob.interacted || []);
       this.resolvedOrderings = new Map(Object.entries(blob.resolvedOrderings || {}));
       this.currentIndex = blob.currentIndex || 0;
       this.submitted = Boolean(blob.submitted);
@@ -91,8 +87,9 @@ export function createApp(onChange) {
     /** @param {number} i @returns {number} the clamped index actually set */
     setIndex(i) {
       const n = this.model ? this.model.questions.length : 0;
+      const prev = this.currentIndex;
       this.currentIndex = n === 0 ? 0 : Math.max(0, Math.min(i, n - 1));
-      this._save();
+      if (this.currentIndex !== prev) this._save(); // skip redundant writes (e.g. on resume)
       return this.currentIndex;
     },
     next() {
@@ -108,12 +105,6 @@ export function createApp(onChange) {
     // ---- Answer mutation (M3 populates; API defined now) -----------------------
     setAnswer(uid, payload) {
       this.answers.set(uid, payload);
-      this.interacted.add(uid);
-      this._save();
-      return this;
-    },
-    markInteracted(uid) {
-      this.interacted.add(uid);
       this._save();
       return this;
     },
@@ -151,7 +142,6 @@ export function createApp(onChange) {
     /** Clear in-quiz state for a fresh attempt (Retake). */
     reset() {
       this.answers = new Map();
-      this.interacted = new Set();
       this.resolvedOrderings = new Map();
       this.currentIndex = 0;
       this.submitted = false;

@@ -3,8 +3,8 @@
 //
 // Two SEPARATE storage keys per assessment:
 //   - the shuffle SEED (own key) — minted once, restored on reload (§2.5)
-//   - the session BLOB (own key) — reserved for M5: answers, interacted flags,
-//     resolved orderings, current index, submitted flag, and results (§7)
+//   - the session BLOB (own key): answers, resolved orderings, current index,
+//     and a submitted flag (§7). Results are recomputed from answers on restore.
 //
 // The seed lives in its own key ON PURPOSE: minting a seed at boot must NOT
 // create a "session" that looks like resumable progress, and must never be able
@@ -67,7 +67,14 @@ export function loadSession(fingerprint) {
 export function hasSavedProgress(fingerprint) {
   const s = loadSession(fingerprint);
   if (!s) return false;
-  return Boolean(s.submitted) || (s.answers && Object.keys(s.answers).length > 0);
+  if (s.submitted) return true;
+  // A key with an empty payload ([] / {}) isn't real progress (e.g. a toggle on
+  // then off), so check for substantive content, not just key count.
+  return Object.values(s.answers || {}).some(
+    (v) =>
+      v != null &&
+      (typeof v !== "object" ? true : Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0)
+  );
 }
 
 /**

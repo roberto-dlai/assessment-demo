@@ -11,15 +11,19 @@ export function render(container, { question, app, rng, onChange, announce }) {
   const uid = question.uid;
   const byId = new Map(question.items.map((it) => [it.id, it]));
 
-  // Current order: the saved answer, else a seeded shuffle guaranteed != correct.
+  // Current order: the saved answer; else the persisted resolved presentation
+  // order (so restore can't diverge from the reshuffle rule, SPEC §2.5/§7); else
+  // a fresh seeded shuffle guaranteed != correct.
   let order = app.answers.get(uid);
-  if (!order) {
+  if (order) {
+    order = [...order];
+  } else if (app.resolvedOrderings.get(uid)) {
+    order = [...app.resolvedOrderings.get(uid)];
+  } else {
     order = shuffleUntil(question.items, rng, (c) => sameOrder(c, question.items, (it) => it.id)).map(
       (it) => it.id
     );
     app.setResolvedOrdering(uid, order);
-  } else {
-    order = [...order];
   }
 
   const list = el("ol", "ordering");
