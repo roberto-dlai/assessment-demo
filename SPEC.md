@@ -177,7 +177,7 @@ Every state is conveyed by **shape + text label**, not color alone (color is sec
 | State | Shape | `aria-label` | Color | Definition |
 |---|---|---|---|---|
 | Not answered | ○ hollow | "not answered" | muted grey | no answer recorded |
-| In progress | ◐ half | "in progress" | teal | grouping partially placed, or matching partially matched |
+| In progress | ◐ half | "in progress" | amber | grouping partially placed, or matching partially matched (same amber as results "partial") |
 | Answered | ● filled dot | "answered" | teal | single selected; multi ≥1 selected; grouping all placed; matching all matched; ordering reordered |
 
 - **Multiple-selections** shows **Answered** once ≥1 option is selected, but its `aria-label` reads "answered — multi-select, review before submitting". It never claims completeness we can't verify.

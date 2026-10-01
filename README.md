@@ -53,8 +53,21 @@ Retake / Start over clear storage. Falls back to in-memory with a notice when
 `localStorage` is unavailable; stale blobs are discarded on
 fingerprint/schemaVersion mismatch.
 
+**M6 — Polish, a11y, CI, deploy: complete.** CI (`.github/workflows/ci.yml`)
+runs the test suite on every push/PR. Accessibility pass: status/outcome signals
+use shape + text label (not color alone), with in-progress now **amber** vs the
+teal answered dot so they differ by color too; the submit modal and mobile
+navigator use focus traps + `inert` background; roving-tabindex navigator; two
+`aria-live` regions; `lang`, skip link, visible focus, and
+`prefers-reduced-motion` all in place; 44px primary touch targets; contrast
+verified AA (point chip, status, outcome colors). The error screen has a **Try
+again** retry (§10). CTA semantics hold (one coral primary per screen).
+
+> The header shows a text wordmark ("DeepLearning.AI", coral); swap in the
+> official logo asset when available (SPEC §8).
+
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
-`main` via `.github/workflows/deploy-pages.yml`).
+`main` via `.github/workflows/deploy-pages.yml`; tests gated by CI).
 
 ## Running locally
 

@@ -527,7 +527,7 @@ body {
   color: var(--app-text-muted);
 }
 .nav-item__icon--in-progress {
-  color: var(--dl-teal);
+  color: var(--app-amber-text); /* amber ◐ — distinct from the teal answered dot and matches results "partial" */
 }
 .nav-item__icon--answered {
   color: var(--dl-teal);
