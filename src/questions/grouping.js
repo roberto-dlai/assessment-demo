@@ -20,8 +20,10 @@ export function render(container, { question, app, rng, onChange, announce }) {
 
   const root = el("div", "pickplace");
   root.append(el("p", "pickplace__hint", "Select an item, then choose a group to place it in."));
+  const pool = el("ul", "pool"); // unplaced items as loose chips (no box/label)
+  pool.setAttribute("aria-label", "Unplaced items");
   const bins = el("div", "bins");
-  root.append(bins);
+  root.append(pool, bins);
 
   const itemsIn = (group) => display.filter((it) => (current[it.id] || POOL) === group);
 
@@ -59,25 +61,26 @@ export function render(container, { question, app, rng, onChange, announce }) {
     if (b) b.focus();
   }
 
-  function makeBin(group, title, isPool) {
-    const sec = el("section", isPool ? "bin bin--pool" : "bin");
-    sec.setAttribute("aria-label", isPool ? "Unplaced items" : `Group: ${title}`);
-    const target = el("button", "bin__target", title);
+  function makeChip(it) {
+    const chip = el("button", selectedId === it.id ? "chip chip--selected" : "chip", it.label);
+    chip.type = "button";
+    chip.setAttribute("aria-pressed", selectedId === it.id ? "true" : "false");
+    chip.addEventListener("click", () => selectItem(it.id));
+    itemRefs.set(it.id, chip);
+    return chip;
+  }
+
+  function makeGroupBin(group) {
+    const sec = el("section", "bin");
+    sec.setAttribute("aria-label", `Group: ${group}`);
+    const target = el("button", "bin__target", group);
     target.type = "button";
-    target.setAttribute(
-      "aria-label",
-      isPool ? "Move the selected item to unplaced" : `Place the selected item in ${title}`
-    );
+    target.setAttribute("aria-label", `Place the selected item in ${group}`);
     target.addEventListener("click", () => placeInto(group));
     const list = el("ul", "bin__items");
     for (const it of itemsIn(group)) {
       const li = el("li", "bin__item");
-      const chip = el("button", selectedId === it.id ? "chip chip--selected" : "chip", it.label);
-      chip.type = "button";
-      chip.setAttribute("aria-pressed", selectedId === it.id ? "true" : "false");
-      chip.addEventListener("click", () => selectItem(it.id));
-      itemRefs.set(it.id, chip);
-      li.append(chip);
+      li.append(makeChip(it));
       list.append(li);
     }
     sec.append(target, list);
@@ -86,9 +89,14 @@ export function render(container, { question, app, rng, onChange, announce }) {
 
   function paint() {
     itemRefs = new Map();
+    pool.innerHTML = "";
+    for (const it of itemsIn(POOL)) {
+      const li = el("li", "pool__item");
+      li.append(makeChip(it));
+      pool.append(li);
+    }
     bins.innerHTML = "";
-    bins.append(makeBin(POOL, "Unplaced", true));
-    for (const g of question.groupNames) bins.append(makeBin(g, g, false));
+    for (const g of question.groupNames) bins.append(makeGroupBin(g));
   }
 
   paint();
