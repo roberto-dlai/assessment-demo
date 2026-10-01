@@ -1,7 +1,7 @@
 # Assessment Demo
 
 A static, single-page web app that delivers a multi-challenge assessment loaded
-from JSON — five question types, free navigation, auto-advance, partial-credit
+from JSON — five question types, free navigation, partial-credit
 scoring, progress persistence, and a results view, styled to DeepLearning.AI's
 brand.
 
@@ -15,16 +15,15 @@ seeded PRNG/shuffle utilities, and the assessment data layer (load → validate 
 normalize → flatten, with stable item ids and a content fingerprint).
 
 **M1 — Instructions screen: complete.** Full instructions screen (summary,
-data-derived type legend, how-it-works), a persisted auto-advance toggle,
-session-seed ownership (mint-or-restore, fingerprint-scoped), a safe
-localStorage wrapper with in-memory fallback, and a GitHub Pages deploy
-workflow.
+data-derived type legend, how-it-works), session-seed ownership
+(mint-or-restore, fingerprint-scoped), a safe localStorage wrapper with
+in-memory fallback, and a GitHub Pages deploy workflow.
 
 **M2 — Quiz shell & navigation: complete.** Keyed state-mutation API
 (currentIndex/answers/interacted/resolvedOrderings, patched in place — no
 full re-render), question panel (scenario banner, challenge/point meta,
-prompt), Back/Next + challenge-grouped navigator with status icons and
-jump-to, a progress indicator, and a mobile navigator drawer with focus trap.
+prompt), Back/Next + a compact full-width horizontal navigator (grouped by
+challenge, roving tabindex, status icons, jump-to), and a progress indicator.
 The per-type answer widgets and scoring are the placeholders that land in
 M3–M4.
 

@@ -21,7 +21,6 @@ Goal: repo runs locally (via a static server) and loads the assessment.
 ### M1 — Instructions screen + early deploy
 - [ ] Render `capability_name`, `audience`, `estimated_duration` (marked "informational guide"), `lead_scenario`.
 - [ ] Summary (challenge/question counts, total points, type legend).
-- [ ] **Auto-advance toggle** (persisted preference).
 - [ ] Start CTA → quiz; Resume/Start-over when saved state exists (stub until M5).
 - [ ] **Throwaway GitHub Pages deploy of the skeleton** to shake out base-path/subpath issues early (decide publish source: Actions or `/docs`).
 **Deliverable:** branded landing screen that launches the quiz, verified live on GitHub Pages.
@@ -35,15 +34,15 @@ Goal: repo runs locally (via a static server) and loads the assessment.
 
 ### M3 — Question types (the core)
 One vertical slice per type: render (shuffled) → capture answer → status → grade fn.
-- [ ] `single_selection` (+ auto-advance).
-- [ ] `multiple_selections` (no auto-advance; "review before submitting" labeling).
-- [ ] `grouping` (click-to-assign pool↔bins; bins labelled from `groups` keys; +auto-advance on last placement).
-- [ ] `matching` (assign right→left; **auto-match only on forward assignment leaving one pair**; announce it; +auto-advance).
+- [ ] `single_selection`.
+- [ ] `multiple_selections` ("review before submitting" labeling).
+- [ ] `grouping` (click-to-assign pool↔bins; bins labelled from `groups` keys).
+- [ ] `matching` (assign right→left; **auto-match only on forward assignment leaving one pair**; announce it).
 - [ ] `ordering` (up/down + drag; deterministic reshuffle-if-equal; move announcements).
 - [ ] Shared `interacted`-flag + status logic (not-answered / in-progress / answered), shape+label icons (§6).
-- [ ] **Auto-advance engine:** toggle-aware, keyboard-suppressed, single cancelable timer, per-question `hasAutoAdvanced` guard, focus-to-heading (§4.6).
-- [ ] Two `aria-live` regions (polite/assertive) + per-action announcements (§4.7).
+- [ ] Per-action announcements through the two `aria-live` regions (§4.6).
 - [ ] Drag is additive-only over the click baseline; ≥24px targets.
+- [ ] Widget lifecycle seam (mount-once-and-cache per question, rehydrate from `app.answers`) + per-type module registry (`render/isInteracted/isComplete/statusOf/score`).
 **Deliverable:** every type fully answerable and individually gradable.
 
 ### M4 — Scoring & results
@@ -54,7 +53,7 @@ One vertical slice per type: render (shuffled) → capture answer → status →
 **Deliverable:** full submit → graded results flow.
 
 ### M5 — Persistence
-- [ ] `localStorage` blob (answers, `interacted` flags, seed + **resolved orderings**, index, auto-advance toggle, results, `submitted`, `schemaVersion`) namespaced by **content fingerprint**.
+- [ ] `localStorage` blob (answers, `interacted` flags, seed + **resolved orderings**, index, results, `submitted`, `schemaVersion`) namespaced by **content fingerprint**.
 - [ ] try/catch all storage access; degrade to in-memory + notice when unavailable.
 - [ ] Save on every answer/navigation; restore on load; Resume vs Start-over.
 - [ ] Restore results screen after submit; discard on fingerprint/`schemaVersion` mismatch; Retake clears storage.
@@ -93,8 +92,7 @@ One vertical slice per type: render (shuffled) → capture answer → status →
 ## Testing
 - `node --test` on pure scoring/PRNG modules: all types, partial-credit boundaries (incl. multi-select select-all = 0.33, clamp-to-zero), seeded-shuffle reproducibility.
 - Manual matrix: each type × {answer correctly, partially, skip} → results.
-- **Auto-advance:** fires once, cancels on mid-delay nav/edit, suppressed under keyboard nav, no-op on last question.
-- **Matching:** auto-match only on forward last assignment; un-assign + re-edit does not re-advance; wrong earlier pair grades correctly.
+- **Matching:** auto-match only on forward last assignment; wrong earlier pair grades correctly.
 - Reload at each stage (mid-quiz, post-submit) reproduces exact layout; `localStorage`-disabled fallback.
 - Keyboard-only + screen-reader smoke test (focus lands on headings, announcements fire).
 - Cross-device: desktop + mobile widths; GitHub Pages subpath live check.
@@ -103,7 +101,6 @@ One vertical slice per type: render (shuffled) → capture answer → status →
 - **Critical path:** M0 → M2 → M3 → M4. M1/M5/M6 can overlap once the shell exists.
 - **Highest-risk item:** accessible, touch-friendly grouping/matching/ordering. Mitigation: click-to-assign baseline first, drag as enhancement (M3), a11y verified in M6.
 - **`file://` + base-path trap:** mitigated by requiring a dev server (M0), relative paths, and an early throwaway deploy (M1) — not deferring deploy to M6.
-- **Auto-advance a11y:** timed focus changes disorient keyboard/SR users. Mitigation: toggle + keyboard-suppression + announce-then-focus-heading (M3), verified M6.
 - **Answer-key exposure:** accepted per spec; revisit only if stakes change.
 
 ## Definition of done

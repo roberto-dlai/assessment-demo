@@ -27,22 +27,18 @@ export function createApp(onChange) {
     error: null,
     /** @type {number|null} per-assessment shuffle seed (SPEC §2.5) */
     sessionSeed: null,
-    /** @type {{autoAdvance: boolean}} global user preferences (SPEC §4.6) */
-    prefs: { autoAdvance: true },
 
     // ---- In-quiz state (keyed by question uid) --------------------------------
     // These are mutated in place by the quiz screen, which patches the DOM
     // directly rather than routing through the full-screen `onChange` render.
     // `onChange` is reserved for ROUTE changes (screen swaps) only, so per-answer
-    // and per-navigation updates never destroy focus or the auto-advance timer.
+    // and per-navigation updates never destroy focus or in-progress input.
     /** @type {number} current question index into model.questions */
     currentIndex: 0,
     /** @type {Map<string, any>} uid -> answer payload (M3) */
     answers: new Map(),
     /** @type {Set<string>} uids the learner has interacted with (SPEC §6) */
     interacted: new Set(),
-    /** @type {Set<string>} uids that already auto-advanced once (SPEC §4.6; M3 wires it) */
-    hasAutoAdvanced: new Set(),
     /** @type {Map<string, string[]>} uid -> resolved shuffle order of item ids (M3) */
     resolvedOrderings: new Map(),
     /** @type {boolean} */
@@ -56,10 +52,6 @@ export function createApp(onChange) {
     },
     setSessionSeed(seed) {
       this.sessionSeed = seed;
-      return this;
-    },
-    setPrefs(prefs) {
-      this.prefs = prefs;
       return this;
     },
 

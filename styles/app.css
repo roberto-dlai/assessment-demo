@@ -80,34 +80,6 @@ body {
   gap: 0.35rem;
 }
 
-/* Auto-advance toggle */
-.toggle {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.75rem 0;
-}
-.toggle__row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.toggle__input {
-  width: 1.15rem;
-  height: 1.15rem;
-  accent-color: var(--dl-teal);
-  flex: none;
-}
-.toggle__label {
-  cursor: pointer;
-}
-.toggle__help {
-  margin: 0;
-  padding-left: 1.75rem;
-  font-size: 0.875rem;
-  color: var(--app-text-muted);
-}
-
 /* Action buttons row */
 .actions {
   display: flex;

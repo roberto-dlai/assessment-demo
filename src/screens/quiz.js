@@ -1,9 +1,9 @@
 // Quiz screen (SPEC §3.2).
 //
 // Built ONCE on route entry, then patched in place — navigation and (in M3)
-// answer changes mutate existing DOM nodes rather than re-rendering, so focus,
-// inputs, and the auto-advance timer are never destroyed. The type-specific
-// answer widgets are placeholders here and land in M3.
+// answer changes mutate existing DOM nodes rather than re-rendering, so focus
+// and in-progress inputs are never destroyed. The type-specific answer widgets
+// are placeholders here and land in M3.
 
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
@@ -99,7 +99,7 @@ export function renderQuiz(root, app) {
       // Icon on top, number below — compact square buttons (the button's
       // aria-label carries the full "Challenge X, question N, status" for AT).
       btn.append(icon, num);
-      btn.addEventListener("click", () => goTo(q.index, { reason: "navigator" }));
+      btn.addEventListener("click", () => goTo(q.index));
       const li = el("li", "navigator__item");
       li.append(btn);
       ul.append(li);
@@ -191,26 +191,22 @@ export function renderQuiz(root, app) {
     focusHeading(prompt);
   }
 
-  function goTo(index, { reason = "nav" } = {}) {
+  function goTo(index) {
     app.setIndex(index);
     showQuestion(app.currentIndex);
-    // Auto-advance (M3) owns its own assertive announcement and calls goTo with
-    // reason "auto-advance"; manual/initial navigation announces POLITELY so it
-    // doesn't fight the focus-driven heading read.
-    if (reason !== "auto-advance") {
-      const m = qMeta.get(model.questions[app.currentIndex].uid);
-      announce(`Question ${app.currentIndex + 1} of ${total}. Challenge ${m.challenge}.`);
-    }
+    // Announce position POLITELY so it doesn't fight the focus-driven heading read.
+    const m = qMeta.get(model.questions[app.currentIndex].uid);
+    announce(`Question ${app.currentIndex + 1} of ${total}. Challenge ${m.challenge}.`);
   }
 
   // ---- Wire controls ----
-  backBtn.addEventListener("click", () => goTo(app.currentIndex - 1, { reason: "nav" }));
-  nextBtn.addEventListener("click", () => goTo(app.currentIndex + 1, { reason: "nav" }));
+  backBtn.addEventListener("click", () => goTo(app.currentIndex - 1));
+  nextBtn.addEventListener("click", () => goTo(app.currentIndex + 1));
   submitBtn.addEventListener("click", () => app.go(SCREENS.RESULTS));
 
   // ---- Initial paint ----
   refreshAllNav();
-  goTo(app.currentIndex, { reason: "initial" });
+  goTo(app.currentIndex);
 }
 
 function ctlButton(text, variant) {

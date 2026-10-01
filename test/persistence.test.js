@@ -14,7 +14,6 @@ import {
   isPersistent,
   _resetForTests,
 } from "../src/util/storage.js";
-import { loadPrefs, savePrefs, setAutoAdvance } from "../src/prefs.js";
 import {
   getOrCreateSeed,
   loadSession,
@@ -77,25 +76,6 @@ test("getJSON/setJSON round-trip and tolerate bad data", () => {
   assert.equal(getJSON("absent"), null);
   setItem("corrupt", "{not json");
   assert.equal(getJSON("corrupt"), null);
-});
-
-test("prefs default to auto-advance on, and persist changes", () => {
-  assert.deepEqual(loadPrefs(), { autoAdvance: true });
-  const updated = setAutoAdvance(false);
-  assert.deepEqual(updated, { autoAdvance: false });
-  assert.deepEqual(loadPrefs(), { autoAdvance: false });
-});
-
-test("prefs merge over defaults and coerce to boolean", () => {
-  savePrefs({ autoAdvance: 1 });
-  assert.deepEqual(loadPrefs(), { autoAdvance: true });
-});
-
-test("loadPrefs ignores non-object stored values", () => {
-  setJSON("assessment:prefs:v1", [1, 2, 3]);
-  assert.deepEqual(loadPrefs(), { autoAdvance: true });
-  setJSON("assessment:prefs:v1", "true");
-  assert.deepEqual(loadPrefs(), { autoAdvance: true });
 });
 
 test("getOrCreateSeed mints once then restores the same seed", () => {

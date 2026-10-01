@@ -3,7 +3,6 @@
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
 import { focusHeading } from "../util/a11y.js";
-import { setAutoAdvance } from "../prefs.js";
 import { hasSavedProgress, startFresh } from "../session.js";
 
 const TYPE_LABELS = {
@@ -22,13 +21,7 @@ export function renderInstructions(root, app) {
   section.append(h1, metaLine(meta));
   if (meta.lead_scenario) section.append(el("p", "screen__lead", meta.lead_scenario));
 
-  section.append(
-    summary(counts),
-    typeLegend(app.model),
-    howItWorks(),
-    autoAdvanceToggle(app),
-    actions(root, app)
-  );
+  section.append(summary(counts), typeLegend(app.model), howItWorks(), actions(root, app));
 
   // Moving focus to the h1 makes the screen reader announce the title; a
   // separate announcement here would double-speak, so we rely on focus alone.
@@ -85,30 +78,6 @@ function howItWorks() {
     list.append(el("li", "", note));
   }
   wrap.append(list);
-  return wrap;
-}
-
-function autoAdvanceToggle(app) {
-  const wrap = el("div", "toggle");
-  const row = el("div", "toggle__row");
-
-  const input = el("input", "toggle__input");
-  input.type = "checkbox";
-  input.id = "auto-advance";
-  input.checked = Boolean(app.prefs.autoAdvance);
-  input.setAttribute("aria-describedby", "auto-advance-help");
-
-  const label = el("label", "toggle__label", "Auto-advance to the next question when I answer");
-  label.setAttribute("for", "auto-advance");
-
-  // No live-region announcement: the native checkbox conveys its own checked
-  // state to assistive tech, so announcing would double-speak.
-  input.addEventListener("change", () => app.setPrefs(setAutoAdvance(input.checked)));
-
-  row.append(input, label);
-  const help = el("p", "toggle__help", "You can change this anytime.");
-  help.id = "auto-advance-help";
-  wrap.append(row, help);
   return wrap;
 }
 

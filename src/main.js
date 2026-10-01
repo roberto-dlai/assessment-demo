@@ -5,7 +5,6 @@
 
 import { loadAssessment } from "./data/loadAssessment.js";
 import { createApp, SCREENS } from "./state.js";
-import { loadPrefs } from "./prefs.js";
 import { getOrCreateSeed } from "./session.js";
 import { renderInstructions } from "./screens/instructions.js";
 import { renderQuiz } from "./screens/quiz.js";
@@ -36,8 +35,7 @@ async function boot() {
     app.setModel(model);
     document.title = `${model.meta.capability_name} — Assessment`;
 
-    // Own preferences + the shuffle seed (mint-or-restore) before first render.
-    app.setPrefs(loadPrefs());
+    // Own the shuffle seed (mint-or-restore) before first render.
     app.setSessionSeed(getOrCreateSeed(model.fingerprint));
 
     app.go(SCREENS.INSTRUCTIONS);
