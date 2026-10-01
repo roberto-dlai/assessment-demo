@@ -93,7 +93,9 @@ export function renderQuiz(root, app) {
       const num = el("span", "nav-item__num", String(i + 1));
       const icon = el("span", "nav-item__icon");
       icon.setAttribute("aria-hidden", "true");
-      btn.append(num, icon);
+      // Icon on top, number below — compact square buttons (the button's
+      // aria-label carries the full "Challenge X, question N, status" for AT).
+      btn.append(icon, num);
       btn.addEventListener("click", () => goTo(q.index, { reason: "navigator" }));
       const li = el("li", "navigator__item");
       li.append(btn);

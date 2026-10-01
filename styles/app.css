@@ -221,8 +221,8 @@ body {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 0.5rem 0.9rem;
-  padding: 0.6rem 0.75rem;
+  gap: 0.4rem 0.7rem;
+  padding: 0.6rem 0.7rem;
   border: 1px solid #eee;
   border-radius: 12px;
 }
@@ -231,7 +231,7 @@ body {
 }
 .navigator__group + .navigator__group {
   border-left: 1px solid #eee;
-  padding-left: 0.9rem;
+  padding-left: 0.7rem;
 }
 .navigator__group-title {
   font-size: 0.68rem;
@@ -251,17 +251,19 @@ body {
 }
 .nav-item {
   display: inline-flex;
+  flex-direction: column; /* icon on top, number below → narrow square buttons */
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
-  min-width: 2.1rem;
-  min-height: 2.1rem; /* ~34px — above the 24px AA minimum, smaller than the 44px aim so it all fits */
-  padding: 0.15rem 0.3rem;
+  gap: 0.05rem;
+  min-width: 1.9rem;
+  min-height: 2.15rem; /* ~34px tall; ~30px wide — above the 24px AA minimum so all 18 fit in one row */
+  padding: 0.1rem 0.25rem;
   border: 1px solid #ddd;
   border-radius: 7px;
   background: var(--dl-white);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
+  line-height: 1.1;
   cursor: pointer;
 }
 .nav-item--active {
