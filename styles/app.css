@@ -249,6 +249,12 @@ body {
 .bins .bin:hover {
   border-color: var(--dl-teal);
 }
+/* Group title: centered plain text, no dashed box (the outer box is the target) */
+.bins .bin__target {
+  text-align: center;
+  border: none;
+  background: transparent;
+}
 .bin__target {
   width: 100%;
   text-align: left;
