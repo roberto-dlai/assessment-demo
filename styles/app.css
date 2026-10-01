@@ -593,11 +593,28 @@ body {
   padding-left: 1.25rem;
   color: var(--app-text-muted);
 }
+.results-jump {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+.results-jump__label {
+  color: var(--app-text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.results-jump__link {
+  font-size: 0.9rem;
+}
 .results-challenge {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   margin-top: 1.25rem;
+}
+.results-challenge h2 {
+  outline: none;
 }
 .results-challenge__scenario {
   margin: 0;

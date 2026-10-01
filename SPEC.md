@@ -120,7 +120,7 @@ Layout: a horizontal question navigator across the top of the quiz, with the que
 ### 3.4 Results screen (after)
 - Score summary: total points earned / total, percentage, per-challenge subtotals.
 - Per-question cards: the prompt, the learner's answer, the outcome, the **correct solution**, points earned, and optional `behavior` tag.
-- **Outcome is shown with a shape + text label, never color alone** (§6): ✓ "Correct", ◐ "Partial — 2 of 3 (0.67 pt)", ✕ "Incorrect", ○ "Not answered". Color is a secondary reinforcement.
+- **Outcome is shown with a shape + text label, never color alone** (§6): ✓ "Correct", ◐ "Partial — 0.67 of 1 pt" (earned of points), ✕ "Incorrect", ○ "Not answered". Color is a secondary reinforcement. A **"Review by challenge"** jump-nav links to each challenge's section.
 - The **correct solution renders canonically from the source data**, independent of the session shuffle (e.g., `correct_order` in true order, `pairs` in their given pairing) — never in shuffled positions.
 - Supportive microcopy for incorrect/partial states ("Here's the reasoning"), never at the learner's expense.
 - Actions: **Review by challenge** (jump to any question's result), **Retake** (clears storage, returns to instructions).
@@ -209,7 +209,7 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 - **Typography:** Poppins (500/600) for headings, question prompts, CTAs; Open Sans (400/600) for body and options. Maintain headline ≈ 2× body hierarchy; scale fluidly.
 - **Voice:** friendly, encouraging, succinct. Motivate ("Nice work — here's how you did"); for incorrect/partial, explain the reasoning supportively, never at the learner's expense.
 - **Logo:** coral horizontal lockup on white header — **one color only, must read "DeepLearning.AI" (D/L/AI capitalized), no effects/distortion/recolor**. Placeholder until the official asset is provided.
-- **Components:** rounded cards, soft tint-circle icons, generous spacing. **Point badge** = a light-teal chip whose fill/text pairing clears **AA ≥4.5:1** (the brand's default `.dl-tag` `#164C59` on `#32AFCC` is only ~3.2:1 at 13px — use a lighter fill or ≥18.66px bold text instead). One coral primary action per screen. Contrast AA throughout.
+- **Components:** rounded cards, soft tint-circle icons, generous spacing. **Point badge** uses the `.dl-tag` chip **with an app override** (light-teal fill `#e3f1f5` + darkest-teal text `#164C59` ≈ 9:1) because the brand's default `.dl-tag` (`#164C59` on `#32AFCC`) is only ~3.2:1 at 13px. One coral primary action per screen. Contrast AA throughout.
 
 ---
 
@@ -225,6 +225,7 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 - **Randomness:** named seeded PRNG (`mulberry32`); per-question sub-seeds from `sessionSeed + question.id` (§2.5). No `Math.random()`.
 - **Browser support:** modern evergreen browsers (Chrome/Edge/Firefox/Safari); no IE, no transpile — which justifies the no-build stance.
 - **No external runtime dependencies** and no drag library — click-to-assign is the only interaction. (Any future drag enhancement must degrade to this click baseline.)
+- **CI/CD:** `.github/workflows/ci.yml` runs the test suite (`node --test`, zero deps) on every push/PR; `.github/workflows/deploy-pages.yml` deploys to GitHub Pages from the repo root.
 
 ---
 

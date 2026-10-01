@@ -8,8 +8,6 @@
 import { el } from "../screens/dom.js";
 import { shuffle } from "../util/shuffle.js";
 
-export const noun = "matching";
-
 export function render(container, { question, app, rng, onChange, announce }) {
   const uid = question.uid;
   const current = { ...(app.answers.get(uid) || {}) };

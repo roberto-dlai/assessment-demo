@@ -157,7 +157,13 @@ export function renderQuiz(root, app) {
     ref.icon.textContent = s.shape;
     ref.icon.className = `nav-item__icon nav-item__icon--${status}`;
     const m = qMeta.get(uid);
-    ref.btn.setAttribute("aria-label", `Challenge ${m.challenge}, question ${m.pos}, ${s.label}`);
+    // Multi-select never claims completeness we can't verify (SPEC §6).
+    const q = model.byUid.get(uid);
+    const stateLabel =
+      status === "answered" && q.type === "multiple_selections"
+        ? "answered — multi-select, review before submitting"
+        : s.label;
+    ref.btn.setAttribute("aria-label", `Challenge ${m.challenge}, question ${m.pos}, ${stateLabel}`);
   }
   function refreshAllNav() {
     for (const q of model.questions) refreshNav(q.uid);

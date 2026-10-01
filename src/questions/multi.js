@@ -4,8 +4,6 @@
 import { el } from "../screens/dom.js";
 import { shuffle } from "../util/shuffle.js";
 
-export const noun = "multiple-choice";
-
 export function render(container, { question, app, rng, onChange }) {
   const uid = question.uid;
   const selected = new Set(app.answers.get(uid) || []);

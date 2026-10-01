@@ -2,7 +2,6 @@
 //   render(container, { question, app, rng, onChange, announce })
 //   statusOf(answer, question) -> "not-answered" | "in-progress" | "answered"
 //   score(answer, question)    -> number in [0, 1]
-//   noun                       -> short display noun
 
 import * as single_selection from "./single.js";
 import * as multiple_selections from "./multi.js";

@@ -7,7 +7,6 @@
 import { el } from "../screens/dom.js";
 import { shuffle } from "../util/shuffle.js";
 
-export const noun = "grouping";
 const POOL = "__pool__";
 
 export function render(container, { question, app, rng, onChange, announce }) {

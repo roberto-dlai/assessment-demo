@@ -20,7 +20,7 @@ data-derived type legend, how-it-works), session-seed ownership
 in-memory fallback, and a GitHub Pages deploy workflow.
 
 **M2 — Quiz shell & navigation: complete.** Keyed state-mutation API
-(currentIndex/answers/interacted/resolvedOrderings, patched in place — no
+(currentIndex/answers/resolvedOrderings, patched in place — no
 full re-render), question panel (scenario banner, challenge/point meta,
 prompt), Back/Next + a compact full-width horizontal navigator (grouped by
 challenge, roving tabindex, status icons, jump-to), and a progress indicator.
@@ -44,8 +44,8 @@ per-question review (your answer, the canonical correct answer, and outcome as
 shape+label — ✓ correct / ◐ partial / ✕ incorrect / ○ not answered). Retake
 clears state and returns to the start.
 
-**M5 — Persistence: complete.** In-quiz state (answers, interacted, resolved
-orderings, current index, submitted) auto-saves to `localStorage` on every
+**M5 — Persistence: complete.** In-quiz state (answers, resolved orderings,
+current index, submitted) auto-saves to `localStorage` on every
 change, in a blob namespaced by the content fingerprint (seed in its own key).
 On load, a session with real progress restores and the instructions screen
 offers Resume / Start over; a submitted session reloads straight to results.
@@ -56,8 +56,8 @@ fingerprint/schemaVersion mismatch.
 **M6 — Polish, a11y, CI, deploy: complete.** CI (`.github/workflows/ci.yml`)
 runs the test suite on every push/PR. Accessibility pass: status/outcome signals
 use shape + text label (not color alone), with in-progress now **amber** vs the
-teal answered dot so they differ by color too; the submit modal and mobile
-navigator use focus traps + `inert` background; roving-tabindex navigator; two
+teal answered dot so they differ by color too; the submit modal uses a focus
+trap + `inert` background; roving-tabindex navigator; two
 `aria-live` regions; `lang`, skip link, visible focus, and
 `prefers-reduced-motion` all in place; 44px primary touch targets; contrast
 verified AA (point chip, status, outcome colors). The error screen has a **Try
@@ -82,8 +82,8 @@ npm run serve            # runs `npx serve .`
 python3 -m http.server 8000
 ```
 
-Then visit the printed URL (e.g. <http://localhost:8000>). Open the browser
-console to see the parsed, flattened assessment logged (M0 acceptance).
+Then visit the printed URL (e.g. <http://localhost:8000>). The app boots to the
+instructions screen; load failures surface on an error screen (and the console).
 
 ## Tests
 
@@ -94,7 +94,7 @@ test runner — no dependencies:
 npm test                 # node --test
 ```
 
-Scoring tests arrive with M4.
+Scoring, persistence, and per-type question behavior are all covered.
 
 ## Project structure
 
@@ -107,7 +107,8 @@ data/
 src/
   main.js                  # bootstrap + screen router
   state.js                 # app state + in-quiz answer state (status via registry)
-  session.js               # per-assessment session seed (fingerprint-scoped)
+  session.js               # per-assessment seed + session blob (fingerprint-scoped)
+  scoring.js               # grade(app): totals + per-challenge subtotals + outcomes
   data/loadAssessment.js   # load, validate, normalize, flatten, fingerprint
   util/prng.js             # mulberry32 seeded PRNG + helpers
   util/shuffle.js          # deterministic shuffles
@@ -118,9 +119,10 @@ src/
     single.js  multi.js  grouping.js  matching.js  ordering.js
   screens/
     dom.js                 # shared el()/mountScreen()/heading() helpers
-    instructions.js  quiz.js  results.js  error.js
+    modal.js  instructions.js  quiz.js  results.js  error.js
 test/
-  util.test.js  state.test.js  persistence.test.js  questions.test.js  (42 tests)
+  util.test.js  state.test.js  persistence.test.js  persist-session.test.js
+  questions.test.js  scoring.test.js   (53 tests)
 ```
 
 All asset paths are **relative** so the app works from a GitHub Pages project
@@ -128,5 +130,6 @@ subpath (`/<repo>/`).
 
 ## Deployment
 
-Static site — no backend. Intended for GitHub Pages. Publish source (Actions vs
-`/docs`) is finalized in M1's early-deploy step (see `PLAN.md`).
+Static site — no backend. Published to GitHub Pages via GitHub Actions
+(`.github/workflows/deploy-pages.yml`, serving the repo root); `ci.yml` runs the
+test suite on every push/PR.

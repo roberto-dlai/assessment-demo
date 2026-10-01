@@ -1,4 +1,4 @@
-// Accessibility primitives (SPEC §4.6, §4.7).
+// Accessibility primitives (SPEC §4.6).
 //
 // These are the shared building blocks every screen and interaction uses so
 // announcements and focus behave consistently. The live regions themselves are

@@ -5,8 +5,6 @@
 import { el } from "../screens/dom.js";
 import { shuffleUntil, sameOrder } from "../util/shuffle.js";
 
-export const noun = "ordering";
-
 export function render(container, { question, app, rng, onChange, announce }) {
   const uid = question.uid;
   const byId = new Map(question.items.map((it) => [it.id, it]));

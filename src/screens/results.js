@@ -26,10 +26,9 @@ export function renderResults(root, app) {
   const h1 = heading("Here's how you did");
   section.append(h1, summaryBlock(r));
 
-  for (const ch of model.challenges) {
-    if (!ch.questions.length) continue;
-    section.append(challengeBlock(ch, r, app));
-  }
+  const challenges = model.challenges.filter((ch) => ch.questions.length);
+  section.append(reviewNav(challenges)); // jump to any challenge's review (SPEC §3.4)
+  for (const ch of challenges) section.append(challengeBlock(ch, r, app));
 
   const actions = el("div", "actions");
   const retake = el("button", "dl-btn dl-btn--primary", "Retake");
@@ -43,10 +42,21 @@ export function renderResults(root, app) {
   section.append(actions);
 
   focusHeading(h1);
-  announce(
-    `Results: ${fmt(r.totalEarned)} of ${r.totalPossible} points, ${r.percentage} percent.`,
-    { assertive: true }
-  );
+  // Polite: this is a route landing, not a system event, and focus already reads the h1.
+  announce(`Results: ${fmt(r.totalEarned)} of ${r.totalPossible} points, ${r.percentage} percent.`);
+}
+
+// "Review by challenge" — anchor links to each challenge's review section (SPEC §3.4).
+function reviewNav(challenges) {
+  const nav = el("nav", "results-jump");
+  nav.setAttribute("aria-label", "Jump to a challenge");
+  nav.append(el("span", "results-jump__label", "Review by challenge:"));
+  for (const ch of challenges) {
+    const a = el("a", "results-jump__link", `Challenge ${ch.challenge_number}`);
+    a.setAttribute("href", `#rc-${ch.challenge_number}`);
+    nav.append(a);
+  }
+  return nav;
 }
 
 function summaryBlock(r) {
@@ -73,7 +83,10 @@ function summaryBlock(r) {
 
 function challengeBlock(ch, r, app) {
   const sec = el("section", "results-challenge");
-  sec.append(el("h2", "", `Challenge ${ch.challenge_number}`));
+  sec.id = `rc-${ch.challenge_number}`; // anchor target for the review-nav links
+  const h2 = el("h2", "", `Challenge ${ch.challenge_number}`);
+  h2.tabIndex = -1; // focusable so the jump link lands focus here
+  sec.append(h2);
   if (ch.scenario) sec.append(el("p", "results-challenge__scenario", ch.scenario));
   for (const q of ch.questions) sec.append(questionCard(q, r.byUid.get(q.uid), app));
   return sec;
