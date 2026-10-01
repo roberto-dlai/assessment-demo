@@ -48,7 +48,7 @@ export function score(answer, question) {
 // ---- Results review helpers (return arrays of display lines) ----
 export function describeSolution(question) {
   const correct = question.options.find((o) => o.correct);
-  return [correct ? correct.label : ""];
+  return [correct ? correct.label : "(no correct answer)"];
 }
 export function describeAnswer(answer, question) {
   if (!answer) return ["(no answer)"];

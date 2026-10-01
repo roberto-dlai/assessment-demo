@@ -23,7 +23,7 @@ export function renderResults(root, app) {
   const r = app.results || grade(app); // recompute if arrived without stored results
 
   const section = mountScreen(root, "results");
-  const h1 = heading("Your results");
+  const h1 = heading("Here's how you did");
   section.append(h1, summaryBlock(r));
 
   for (const ch of model.challenges) {
@@ -99,10 +99,15 @@ function questionCard(q, res, app) {
 }
 
 function answerList(title, lines) {
+  const clean = (lines || []).filter((l) => l && String(l).trim());
   const wrap = el("div", "rcard__answer");
   wrap.append(el("p", "rcard__answer-title", title));
+  if (!clean.length) {
+    wrap.append(el("p", "rcard__answer-empty", "—"));
+    return wrap;
+  }
   const ul = el("ul", "rcard__answer-list");
-  for (const line of lines) ul.append(el("li", "", line));
+  for (const line of clean) ul.append(el("li", "", line));
   wrap.append(ul);
   return wrap;
 }

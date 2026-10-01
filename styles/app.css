@@ -3,8 +3,9 @@
    milestones. */
 
 :root {
-  /* App-level neutral text token (theme.css has no neutral grey). ~7:1 on white. */
-  --app-text-muted: #595959;
+  /* App-level tokens (theme.css lacks a neutral grey and a text-safe amber). */
+  --app-text-muted: #595959; /* ~7:1 on white */
+  --app-amber-text: #8a6a00; /* "partial" outcome — dark amber, ~5.9:1 on white (brand yellow fails as text) */
 }
 
 * {
@@ -627,10 +628,10 @@ body {
   color: var(--dl-teal);
 }
 .rcard--partial {
-  border-left-color: #8a6a00;
+  border-left-color: var(--app-amber-text);
 }
 .rcard--partial .rcard__outcome {
-  color: #8a6a00;
+  color: var(--app-amber-text);
 }
 .rcard--incorrect {
   border-left-color: var(--dl-magenta);

@@ -14,7 +14,9 @@ export function gradeQuestion(q, answer) {
   const score = mod.score(answer, q); // [0, 1]
   const outcome =
     status === "not-answered" ? "not-answered" : score >= 1 ? "correct" : score > 0 ? "partial" : "incorrect";
-  return { uid: q.uid, id: q.id, type: q.type, points: q.points, score, earned: score * q.points, outcome };
+  // Round earned to 2 dp so per-challenge subtotals visibly sum to the total.
+  const earned = Math.round(score * q.points * 100) / 100;
+  return { uid: q.uid, id: q.id, type: q.type, points: q.points, score, earned, outcome };
 }
 
 /**

@@ -5,6 +5,7 @@ import { el } from "./dom.js";
 import { createFocusTrap } from "../util/a11y.js";
 
 let idCounter = 0;
+let isOpen = false;
 
 /**
  * @param {object} opts
@@ -15,7 +16,13 @@ let idCounter = 0;
  * @returns {{ close: () => void }}
  */
 export function openModal({ title, message, actions, onCancel }) {
-  const titleId = `modal-title-${++idCounter}`;
+  if (isOpen) return { close() {} }; // guard against stacking modals
+  isOpen = true;
+
+  const n = ++idCounter;
+  const titleId = `modal-title-${n}`;
+  const msgId = `modal-msg-${n}`;
+  const appRoot = document.getElementById("app");
   const backdrop = el("div", "modal-backdrop");
 
   const dialog = el("div", "modal");
@@ -27,7 +34,12 @@ export function openModal({ title, message, actions, onCancel }) {
   const heading = el("h2", "modal__title", title);
   heading.id = titleId;
   dialog.append(heading);
-  if (message) dialog.append(el("p", "modal__message", message));
+  if (message) {
+    const p = el("p", "modal__message", message);
+    p.id = msgId;
+    dialog.setAttribute("aria-describedby", msgId);
+    dialog.append(p);
+  }
 
   const row = el("div", "modal__actions");
   const trap = createFocusTrap(dialog, {
@@ -39,7 +51,13 @@ export function openModal({ title, message, actions, onCancel }) {
   });
 
   function close() {
+    isOpen = false;
     document.body.style.overflow = "";
+    // restore the background to AT + remove inert BEFORE returning focus
+    if (appRoot) {
+      appRoot.removeAttribute("inert");
+      appRoot.removeAttribute("aria-hidden");
+    }
     trap.release();
     backdrop.remove();
   }
@@ -65,6 +83,10 @@ export function openModal({ title, message, actions, onCancel }) {
 
   document.body.append(backdrop);
   document.body.style.overflow = "hidden";
+  if (appRoot) {
+    appRoot.setAttribute("inert", ""); // take the background out of focus/AT
+    appRoot.setAttribute("aria-hidden", "true");
+  }
   trap.activate();
 
   return { close };
