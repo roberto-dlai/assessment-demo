@@ -192,7 +192,7 @@ body {
   margin-top: 0.15rem;
   width: 1.1rem;
   height: 1.1rem;
-  accent-color: var(--dl-blue);
+  accent-color: var(--dl-teal);
   flex: none;
 }
 .choice__label {
@@ -281,11 +281,11 @@ body {
   cursor: pointer;
 }
 .chip--selected {
-  /* selection shown by the brand blue ring + a tint derived from it (no bold,
-     so the text doesn't reflow) */
-  border-color: var(--dl-blue);
-  box-shadow: inset 0 0 0 2px var(--dl-blue);
-  background: color-mix(in srgb, var(--dl-blue) 12%, var(--dl-white));
+  /* selection shown with the same teal as the scenario banner (--dl-bg-featured)
+     + a tint derived from it (no bold, so the text doesn't reflow) */
+  border-color: var(--dl-teal);
+  box-shadow: inset 0 0 0 2px var(--dl-teal);
+  background: color-mix(in srgb, var(--dl-teal) 12%, var(--dl-white));
 }
 /* Placed chip + its remove (×) button */
 .placed {
