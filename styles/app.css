@@ -221,8 +221,8 @@ body {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 0.4rem 0.7rem;
-  padding: 0.6rem 0.7rem;
+  gap: 0.35rem 0.4rem;
+  padding: 0.5rem 0.55rem;
   border: 1px solid #eee;
   border-radius: 12px;
 }
@@ -231,13 +231,13 @@ body {
 }
 .navigator__group + .navigator__group {
   border-left: 1px solid #eee;
-  padding-left: 0.7rem;
+  padding-left: 0.4rem;
 }
 .navigator__group-title {
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin: 0 0 0.3rem;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.25rem;
   color: var(--app-text-muted);
   white-space: nowrap;
 }
@@ -247,7 +247,7 @@ body {
   padding: 0;
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 .nav-item {
   display: inline-flex;
@@ -255,14 +255,14 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.05rem;
-  min-width: 1.9rem;
-  min-height: 2.15rem; /* ~34px tall; ~30px wide — above the 24px AA minimum so all 18 fit in one row */
-  padding: 0.1rem 0.25rem;
+  min-width: 1.65rem;
+  min-height: 2rem; /* ~32px tall; ~26px wide — above the 24px AA minimum so all 18 fit in one row */
+  padding: 0.1rem 0.2rem;
   border: 1px solid #ddd;
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--dl-white);
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   line-height: 1.1;
   cursor: pointer;
 }
