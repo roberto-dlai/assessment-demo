@@ -99,7 +99,7 @@ One vertical slice per type: render (shuffled) → capture answer → status →
 
 ## Sequencing & risks
 - **Critical path:** M0 → M2 → M3 → M4. M1/M5/M6 can overlap once the shell exists.
-- **Highest-risk item:** accessible, touch-friendly grouping/matching/ordering. Mitigation: click-to-assign baseline first, drag as enhancement (M3), a11y verified in M6.
+- **Highest-risk item:** accessible, touch-friendly grouping/matching/ordering. Mitigation: click-to-assign is the sole interaction (no drag); a11y verified in M6.
 - **`file://` + base-path trap:** mitigated by requiring a dev server (M0), relative paths, and an early throwaway deploy (M1) — not deferring deploy to M6.
 - **Answer-key exposure:** accepted per spec; revisit only if stakes change.
 
