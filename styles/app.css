@@ -136,10 +136,9 @@ body {
 }
 
 .quiz {
-  display: grid;
-  grid-template-columns: 1fr 15rem;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  align-items: start;
 }
 
 .quiz__main {
@@ -149,19 +148,10 @@ body {
   min-width: 0;
 }
 
-.quiz__topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
 .quiz__progress {
   margin: 0;
   color: var(--app-text-muted);
   font-weight: 600;
-}
-.quiz__nav-toggle {
-  display: none; /* shown only on narrow screens */
 }
 
 /* Question panel */
@@ -223,26 +213,36 @@ body {
   cursor: not-allowed;
 }
 
-/* Navigator */
+/* Navigator — horizontal bar across the top */
 .navigator {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 0.85rem 1rem;
   border: 1px solid #eee;
   border-radius: 12px;
+  overflow-x: auto; /* scroll horizontally if the challenges exceed the width */
+}
+.navigator__group {
+  flex: none; /* keep each challenge's buttons together; don't shrink */
+}
+.navigator__group + .navigator__group {
+  border-left: 1px solid #eee;
+  padding-left: 1.25rem;
 }
 .navigator__group-title {
   font-size: 0.85rem;
   margin: 0 0 0.4rem;
   color: var(--app-text-muted);
+  white-space: nowrap;
 }
 .navigator__list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.4rem;
 }
 .nav-item {
@@ -274,39 +274,6 @@ body {
 }
 .nav-item__icon--answered {
   color: var(--dl-coral);
-}
-
-/* Mobile drawer backdrop */
-.quiz__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 20;
-}
-
-@media (max-width: 800px) {
-  .quiz {
-    grid-template-columns: 1fr;
-  }
-  .quiz__nav-toggle {
-    display: inline-block;
-  }
-  .navigator {
-    display: none;
-  }
-  .navigator--open {
-    display: flex;
-    position: fixed;
-    z-index: 30;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(20rem, 85vw);
-    border-radius: 0;
-    overflow-y: auto;
-    background: var(--dl-white);
-    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
-  }
 }
 
 /* Accessibility helpers */

@@ -7,7 +7,7 @@
 
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
-import { announce, focusHeading, createFocusTrap } from "../util/a11y.js";
+import { announce, focusHeading } from "../util/a11y.js";
 
 const TYPE_NOUN = {
   single_selection: "multiple-choice",
@@ -74,16 +74,10 @@ export function renderQuiz(root, app) {
   const controls = el("div", "controls");
   controls.append(backBtn, nextBtn, submitBtn);
 
-  // ---- Top bar: progress + mobile navigator toggle ----
+  // ---- Progress indicator ----
   const progress = el("p", "quiz__progress");
-  const navToggle = ctlButton("Questions", "secondary");
-  navToggle.classList.add("quiz__nav-toggle");
-  navToggle.setAttribute("aria-expanded", "false");
-  navToggle.setAttribute("aria-controls", "question-navigator");
-  const topBar = el("div", "quiz__topbar");
-  topBar.append(progress, navToggle);
 
-  // ---- Navigator (grouped by challenge) ----
+  // ---- Navigator (horizontal, grouped by challenge; sits across the top) ----
   const navigator = el("nav", "navigator");
   navigator.id = "question-navigator";
   navigator.setAttribute("aria-label", "Question navigator");
@@ -100,12 +94,7 @@ export function renderQuiz(root, app) {
       const icon = el("span", "nav-item__icon");
       icon.setAttribute("aria-hidden", "true");
       btn.append(num, icon);
-      btn.addEventListener("click", () => {
-        // Close first so the trap's focus-restore doesn't override the focus
-        // that goTo() then puts on the target question's heading.
-        if (isDrawerOpen()) closeDrawer();
-        goTo(q.index, { reason: "navigator" });
-      });
+      btn.addEventListener("click", () => goTo(q.index, { reason: "navigator" }));
       const li = el("li", "navigator__item");
       li.append(btn);
       ul.append(li);
@@ -115,15 +104,12 @@ export function renderQuiz(root, app) {
     navigator.append(group);
   }
 
-  // ---- Assemble ----
-  const backdrop = el("div", "quiz__backdrop");
-  backdrop.hidden = true;
-  backdrop.setAttribute("aria-hidden", "true");
+  // ---- Assemble: navigator across the top, then the question panel below ----
   const main = el("div", "quiz__main");
-  main.append(topBar, panel, controls);
+  main.append(progress, panel, controls);
   const layout = el("div", "quiz");
-  layout.append(main, navigator);
-  section.append(h1, layout, backdrop);
+  layout.append(navigator, main);
+  section.append(h1, layout);
 
   // ---- Patch functions ----
   function refreshNav(uid) {
@@ -174,47 +160,6 @@ export function renderQuiz(root, app) {
       announce(`Question ${app.currentIndex + 1} of ${total}. Challenge ${m.challenge}.`);
     }
   }
-
-  // ---- Mobile drawer ----
-  let trap = null;
-  // navigator already carries aria-label="Question navigator" (set at build), so
-  // it keeps an accessible name once role=dialog is applied.
-  const desktopMq = globalThis.matchMedia ? globalThis.matchMedia("(min-width: 800px)") : null;
-  const isDrawerOpen = () => navigator.classList.contains("navigator--open");
-  function onDesktopChange(e) {
-    // Force-close if the viewport grows to desktop while the drawer is open, so
-    // dialog/modal/trap state can't leak onto the sidebar layout.
-    if (e.matches && isDrawerOpen()) closeDrawer();
-  }
-  function openDrawer() {
-    navigator.classList.add("navigator--open");
-    navigator.setAttribute("role", "dialog");
-    navigator.setAttribute("aria-modal", "true");
-    navigator.tabIndex = -1; // so the dialog container can take initial focus
-    backdrop.hidden = false;
-    navToggle.setAttribute("aria-expanded", "true");
-    document.body.style.overflow = "hidden"; // scroll lock behind the modal
-    if (desktopMq && desktopMq.addEventListener) desktopMq.addEventListener("change", onDesktopChange);
-    // Focus the container first so the dialog's name/role is announced before the
-    // learner tabs into a grid of question buttons.
-    trap = createFocusTrap(navigator, { onEscape: closeDrawer, focusContainer: true });
-    trap.activate();
-  }
-  function closeDrawer() {
-    navigator.classList.remove("navigator--open");
-    navigator.removeAttribute("role");
-    navigator.removeAttribute("aria-modal");
-    backdrop.hidden = true;
-    navToggle.setAttribute("aria-expanded", "false");
-    document.body.style.overflow = "";
-    if (desktopMq && desktopMq.removeEventListener) desktopMq.removeEventListener("change", onDesktopChange);
-    if (trap) {
-      trap.release();
-      trap = null;
-    }
-  }
-  navToggle.addEventListener("click", () => (isDrawerOpen() ? closeDrawer() : openDrawer()));
-  backdrop.addEventListener("click", closeDrawer);
 
   // ---- Wire controls ----
   backBtn.addEventListener("click", () => goTo(app.currentIndex - 1, { reason: "nav" }));
