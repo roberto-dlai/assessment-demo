@@ -29,7 +29,7 @@ Goal: repo runs locally (via a static server) and loads the assessment.
 ### M2 — Quiz shell & navigation
 - [ ] Question panel scaffold: challenge label, point badge, scenario header, prompt.
 - [ ] Back/Next controls + global index management.
-- [ ] Challenge-grouped navigator (sidebar/desktop, drawer/mobile) with jump-to.
+- [ ] Challenge-grouped horizontal navigator across the top (wraps on narrow screens) with jump-to + roving tabindex.
 - [ ] Progress indicator (answered/total).
 **Deliverable:** navigate an empty-answer quiz across all questions in any order.
 
@@ -62,8 +62,8 @@ One vertical slice per type: render (shuffled) → capture answer → status →
 
 ### M6 — Brand polish, a11y, responsive, CI, deploy
 - [ ] Apply full brand pass (one coral primary/screen, CTA semantics, type scale, compliant logo, voice/microcopy).
-- [ ] Accessibility pass: keyboard paths, ARIA roles, **focus management (drawer/modal/navigator), `aria-live` behavior**, contrast AA (incl. point chip + all outcome/status signals verified with a checker), no color-only signaling; screen-reader run-through.
-- [ ] Responsive pass: mobile drawer, ≥24px touch targets, fluid type.
+- [ ] Accessibility pass: keyboard paths, ARIA roles, **focus management (submit modal + navigator roving tabindex), `aria-live` behavior**, contrast AA (incl. point chip + all outcome/status signals verified with a checker), no color-only signaling; screen-reader run-through.
+- [ ] Responsive pass: navigator wrapping, ≥24px touch targets, fluid type.
 - [ ] Edge-case hardening (§10).
 - [ ] Minimal **CI workflow** (run `node --test` scoring tests + lint on push).
 - [ ] Finalize GitHub Pages deploy (source decided in M1); verify live on the subpath.

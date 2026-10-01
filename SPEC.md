@@ -105,13 +105,13 @@ Instructions ──▶ Quiz (question N of M) ──▶ Submit confirm ──▶
 - Primary CTA: **Start assessment** (coral). If saved progress exists, offer **Resume** (coral) + **Start over** (teal/secondary).
 
 ### 3.2 Quiz screen (during)
-Layout: main question panel + question navigator (sidebar on desktop, collapsible drawer on mobile).
+Layout: a horizontal question navigator across the top of the quiz, with the question panel below it. The navigator wraps to more rows on narrow screens (no horizontal scroll).
 
 - **Challenge scenario header** above the first question of each challenge (and shown as context on each question within that challenge, e.g., a persistent banner).
 - **Question panel:** challenge label (e.g., "Challenge 2 · Question 2 of 3"), point value badge ("1 point"), the `prompt`, and the type-specific interaction (§4).
 - **Controls:** Back, Next, and Submit (Submit enabled at any time; confirms if unanswered questions remain).
 - **Navigator:** grouped by challenge; each entry is a real `<button>` showing question number + status icon (§6) + an `aria-label` naming the state; `aria-current="true"` marks the active question. Activating an entry jumps to that question and **moves focus to the target question's heading** (not into an input).
-- **Mobile navigator drawer:** `role="dialog" aria-modal="true"`; traps focus while open, closes on Escape, and returns focus to the button that opened it.
+- **Navigator keyboard model:** the navigator is a single tab stop (roving tabindex) whose tabbable button is the current question; Arrow keys (and Home/End) move between question buttons, so Tab reaches the question panel in one step.
 - Progress indicator: answered count / total.
 
 ### 3.3 Submit confirmation
@@ -232,8 +232,8 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 - **`file://` trap:** ES modules and `fetch()` are both blocked under `file://`. **Dev requires a local static server** (`python3 -m http.server` or `npx serve`) — documented in the README and M0. (To be `file://`-proof and truly zero-dependency, the assessment may instead be embedded as an ES module `export const assessment = {…}`; either choice is acceptable but must be stated.)
 - **Base paths:** GitHub Pages serves from a `/<repo>/` subpath, so **all asset/data paths must be relative** — never root-absolute (`/data/...`) — or they 404 live while working locally.
 - **Data loading:** load the assessment JSON via `fetch()` (or the embedded module above). Filename/path configurable via a constant, relative.
-- **Accessibility:** semantic HTML, ARIA roles for custom controls, full keyboard operation (Tab/arrow/Enter/Space), visible focus, focus management for drawer/modal/navigator (§3.2/§3.3), and click-to-assign as the accessible baseline for grouping/matching/ordering. **Two `aria-live` regions** (§4.7): `polite` for debounced incremental status, `assertive` for navigation/context changes.
-- **Responsive:** single-column on mobile with the navigator as a collapsible drawer; sidebar layout on ≥ tablet. Touch targets ≥24px (aim 44px).
+- **Accessibility:** semantic HTML, ARIA roles for custom controls, full keyboard operation (Tab/arrow/Enter/Space), visible focus, focus management for the submit modal and the navigator (roving tabindex, §3.2/§3.3), and click-to-assign as the accessible baseline for grouping/matching/ordering. **Two `aria-live` regions** (§4.7): `polite` for debounced incremental status, `assertive` for navigation/context changes.
+- **Responsive:** single-column layout; the horizontal top navigator wraps to more rows on narrow screens. Touch targets ≥24px (aim 44px).
 - **Randomness:** named seeded PRNG (`mulberry32`); per-question sub-seeds from `sessionSeed + question.id` (§2.5). No `Math.random()`.
 - **Browser support:** modern evergreen browsers (Chrome/Edge/Firefox/Safari); no IE, no transpile — which justifies the no-build stance.
 - **No external runtime dependencies** required; any drag library added for enhancement must degrade to the click baseline.
@@ -264,6 +264,6 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 6. Progress, `interacted` flags, and the resolved shuffle orderings survive reload; results survive reload after submit; state is discarded on fingerprint/`schemaVersion` mismatch and degrades gracefully when `localStorage` is unavailable.
 7. Results show correct/partial/incorrect (shape + label), points, and the **canonical** correct solution for every question.
 8. Instructions screen renders from the assessment-level fields and exposes the auto-advance toggle.
-9. UI passes WCAG 2.1 AA: contrast (incl. point chip and all outcome/status signals), full keyboard operation, focus management for drawer/modal/navigator, `aria-live` announcements, and drag is additive-only with ≥24px targets. Works on mobile.
+9. UI passes WCAG 2.1 AA: contrast (incl. point chip and all outcome/status signals), full keyboard operation, focus management for the submit modal and navigator (roving tabindex), `aria-live` announcements, and drag is additive-only with ≥24px targets. Works on mobile.
 10. On-brand: coral/teal usage with one coral primary per screen, Poppins/Open Sans, correct CTA semantics, compliant logo.
 11. Uses relative paths and runs correctly from a GitHub Pages subpath; deploys as a static site with no backend.

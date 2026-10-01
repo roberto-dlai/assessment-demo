@@ -41,16 +41,16 @@ const FOCUSABLE =
 
 function focusableWithin(container) {
   // getClientRects() is a more robust visibility test than offsetParent, which
-  // returns null for position:fixed elements (e.g. a fixed modal/drawer).
+  // returns null for position:fixed elements (e.g. a fixed modal).
   return Array.from(container.querySelectorAll(FOCUSABLE)).filter(
     (elm) => elm === document.activeElement || elm.getClientRects().length > 0
   );
 }
 
 /**
- * Create a focus trap for a modal container (mobile navigator drawer, submit
+ * Create a focus trap for a modal container (e.g. the submit-confirmation
  * modal). Traps Tab within the container, closes on Escape, and restores focus
- * to the element that was focused before activation (SPEC §3.2/§3.3).
+ * to the element that was focused before activation (SPEC §3.3).
  * @param {HTMLElement} container
  * @param {{ onEscape?: () => void, focusContainer?: boolean }} [opts]
  *   focusContainer: focus the container itself first (so a dialog's name/role is

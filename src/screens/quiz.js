@@ -104,6 +104,42 @@ export function renderQuiz(root, app) {
     navigator.append(group);
   }
 
+  // Roving tabindex: the navigator is a single tab stop; Arrow/Home/End move
+  // between question buttons, so Tab reaches the question panel in one step and
+  // the learner doesn't wade through every button first (SPEC §9).
+  const navButtons = model.questions.map((q) => navRefs.get(q.uid).btn);
+  function setRoving(activeIdx) {
+    navButtons.forEach((b, j) => {
+      b.tabIndex = j === activeIdx ? 0 : -1;
+    });
+  }
+  navigator.addEventListener("keydown", (e) => {
+    const cur = navButtons.indexOf(document.activeElement);
+    if (cur === -1) return;
+    let target;
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        target = Math.min(cur + 1, navButtons.length - 1);
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        target = Math.max(cur - 1, 0);
+        break;
+      case "Home":
+        target = 0;
+        break;
+      case "End":
+        target = navButtons.length - 1;
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    setRoving(target);
+    navButtons[target].focus();
+  });
+
   // ---- Assemble: navigator across the top, then the question panel below ----
   const main = el("div", "quiz__main");
   main.append(progress, panel, controls);
@@ -143,6 +179,7 @@ export function renderQuiz(root, app) {
       else ref.btn.removeAttribute("aria-current");
       ref.btn.classList.toggle("nav-item--active", active);
     }
+    setRoving(index); // keep the navigator's single tab stop on the current question
     backBtn.disabled = index === 0;
     nextBtn.disabled = index === total - 1;
 
