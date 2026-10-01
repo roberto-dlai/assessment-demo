@@ -130,20 +130,17 @@ Layout: a horizontal question navigator across the top of the quiz, with the que
 
 ## 4. Question-type interactions
 
-Primary interaction model is **click/tap-to-assign** (keyboard- and touch-friendly, AA-accessible). Drag-and-drop may be layered as a progressive enhancement but:
-- it is **never the only way** to answer — every assign/reorder action is fully operable via visible buttons/click;
-- clicking and dragging produce **identical state and identical announcements**;
-- all interactive targets are **≥24×24px** (aim for 44×44px).
+Interaction is **click/tap-to-assign only** — keyboard- and touch-friendly, AA-accessible. Drag-and-drop is **not implemented**; if ever added it must be additive-only (every action stays click-operable, with identical state/announcements and ≥24×24px targets, aim 44×44px).
 
 Every meaningful action is announced to assistive tech via `aria-live` (§4.6): "Placed X in bin Y", "Matched A with B", "Moved 'X' to position 3 of 5".
 
 - **single_selection:** radio-style list; selecting one clears the other.
 - **multiple_selections:** checkbox-style list; toggle any number. See the "in progress" status in §6.
-- **grouping:** an item pool + one bin per group. Click an item then click a bin (or drag) to place it; placed items can be moved back to the pool or to another bin. Answered when all items are placed.
-- **matching:** left column fixed; each left row has a selector/drop target; right values are the assignable pool. Assign each right value to a left row.
+- **grouping:** group bins shown **above** a boxless "unplaced" pool of loose chips. Click an item chip to select it, then click a group to place it — the **whole group box is a click target** (its centered title is the keyboard-focusable control). Each placed chip shows a corner **×** to remove it back to the pool. Answered when all items are placed.
+- **matching:** left rows are fixed, each with a slot target; right values are a pool of chips. Select a value, then click a left row's slot to match it; click a filled slot to pick its value back up. Right values are one-to-one (a used value leaves the pool).
   - **Auto-match final pair:** fires only on a *forward assignment* that leaves exactly one left row and one right value unmatched; the app then matches them and announces it ("Last pair matched automatically: X with Y").
   - ⚠️ Auto-match completes whatever remains — if earlier assignments were wrong, the forced last pair may also be wrong. The learner can un-assign and re-edit any pair before submitting; the correctness is graded normally (§5).
-- **ordering:** a vertical list the learner reorders (move up/down buttons for keyboard + drag for pointer; up disabled on first item, down on last). The learner advances via Next.
+- **ordering:** a vertical list the learner reorders with move up/down buttons (up disabled on first item, down on last). The learner advances via Next.
 
 > **No auto-advance.** The learner always advances explicitly with Back/Next or the navigator; answering a question never moves them automatically. (This reverses the original `prompt.md` requirement, per a later decision.)
 
@@ -175,17 +172,17 @@ A question counts as **correct** in results when `questionScore === 1`, **partia
 
 Each question tracks an explicit **`interacted` boolean**, stored separately from the answer payload. Status is derived from `interacted` + completeness — never inferred from the payload alone (so an ordering question returned to its shuffled start, or a cleared selection, reads correctly).
 
-Every state is conveyed by **shape + text label**, not color alone (color is secondary reinforcement). Shapes must be distinguishable in greyscale:
+Every state is conveyed by **shape + text label**, not color alone (color is secondary reinforcement). Shapes must be distinguishable in greyscale — hollow vs. half vs. full:
 
-| State | Shape | Label / `aria-label` | Definition |
-|---|---|---|---|
-| Not answered | ○ hollow | "Not answered" | `interacted = false` |
-| In progress | ◐ half | "In progress" | grouping partially placed, or matching partially matched |
-| Answered | ✓ filled | "Answered" | single selected; grouping all placed; matching all matched; ordering interacted |
+| State | Shape | `aria-label` | Color | Definition |
+|---|---|---|---|---|
+| Not answered | ○ hollow | "not answered" | muted grey | no answer recorded |
+| In progress | ◐ half | "in progress" | teal | grouping partially placed, or matching partially matched |
+| Answered | ● filled dot | "answered" | teal | single selected; multi ≥1 selected; grouping all placed; matching all matched; ordering reordered |
 
-- **Multiple-selections** shows **Answered** once ≥1 option is selected, but its `aria-label` reads "Answered — multi-select, review before submitting". It never claims completeness we can't verify.
-- The **submit unanswered-warning** (§3.3) flags questions with `interacted = false` only.
-- The "answered" icon required by `prompt.md` = the ✓ filled state.
+- **Multiple-selections** shows **Answered** once ≥1 option is selected, but its `aria-label` reads "answered — multi-select, review before submitting". It never claims completeness we can't verify.
+- Status is derived from the answer payload (via the per-type `statusOf`); the **submit unanswered-warning** (§3.3) flags any question whose status is **not-answered**.
+- The "answered" icon required by `prompt.md` = the ● filled-dot state (colored teal).
 
 ---
 
@@ -206,8 +203,8 @@ Every state is conveyed by **shape + text label**, not color alone (color is sec
 
 Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 
-- **Color:** white backgrounds; **coral `#F65B66`** for primary CTAs and the answered check. **teal `#237B94`** for secondary actions and featured/scenario banners (white text on teal, ~4.9:1 ✓). Blue `#1C74EB` for links (~4.4:1 ✓).
-  - **Contrast rules (AA is a hard requirement):** coral on white is ~3.0:1 — use it **only for solid fills and large/icon elements, never small coral text or hairline glyphs** (the answered ✓ is a solid fill or carries a dark outline). Never use yellow `#FAB901` as text or a small glyph (~1.6:1 — fails).
+- **Color:** white backgrounds; **coral `#F65B66`** for primary CTAs. **teal `#237B94`** for secondary actions, featured/scenario banners (white text on teal, ~4.9:1 ✓), the active navigator highlight, selected options, and the answered status dot. Blue `#1C74EB` for links (~4.4:1 ✓).
+  - **Contrast rules (AA is a hard requirement):** coral on white is ~3.0:1 — use it **only for solid fills and large/icon elements, never small coral text or hairline glyphs**. Never use yellow `#FAB901` as text or a small glyph (~1.6:1 — fails). Teal `#237B94` (~4.9:1) is fine for the small status dot and selection rings.
   - **Outcome colors** reinforce the shape+label (§3.4/§6), never stand alone: correct = **teal** (not off-palette green); partial = an amber chip with a **dark glyph/label** (never yellow text); incorrect = **magenta `#DD3C66`** (reserved for "incorrect" so it stays distinct from coral's CTA/answered meaning).
 - **Typography:** Poppins (500/600) for headings, question prompts, CTAs; Open Sans (400/600) for body and options. Maintain headline ≈ 2× body hierarchy; scale fluidly.
 - **Voice:** friendly, encouraging, succinct. Motivate ("Nice work — here's how you did"); for incorrect/partial, explain the reasoning supportively, never at the learner's expense.
@@ -227,7 +224,7 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 - **Responsive:** single-column layout; the horizontal top navigator wraps to more rows on narrow screens. Touch targets ≥24px (aim 44px).
 - **Randomness:** named seeded PRNG (`mulberry32`); per-question sub-seeds from `sessionSeed + question.id` (§2.5). No `Math.random()`.
 - **Browser support:** modern evergreen browsers (Chrome/Edge/Firefox/Safari); no IE, no transpile — which justifies the no-build stance.
-- **No external runtime dependencies** required; any drag library added for enhancement must degrade to the click baseline.
+- **No external runtime dependencies** and no drag library — click-to-assign is the only interaction. (Any future drag enhancement must degrade to this click baseline.)
 
 ---
 
@@ -254,6 +251,6 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
 5. Progress, `interacted` flags, and the resolved shuffle orderings survive reload; results survive reload after submit; state is discarded on fingerprint/`schemaVersion` mismatch and degrades gracefully when `localStorage` is unavailable.
 6. Results show correct/partial/incorrect (shape + label), points, and the **canonical** correct solution for every question.
 7. Instructions screen renders from the assessment-level fields.
-8. UI passes WCAG 2.1 AA: contrast (incl. point chip and all outcome/status signals), full keyboard operation, focus management for the submit modal and navigator (roving tabindex), `aria-live` announcements, and drag is additive-only with ≥24px targets. Works on mobile.
+8. UI passes WCAG 2.1 AA: contrast (incl. point chip and all outcome/status signals), full keyboard operation, focus management for the submit modal and navigator (roving tabindex), `aria-live` announcements, and click-to-assign as the accessible baseline with ≥24px targets. Works on mobile.
 9. On-brand: coral/teal usage with one coral primary per screen, Poppins/Open Sans, correct CTA semantics, compliant logo.
 10. Uses relative paths and runs correctly from a GitHub Pages subpath; deploys as a static site with no backend.

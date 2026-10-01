@@ -38,10 +38,10 @@ One vertical slice per type: render (shuffled) → capture answer → status →
 - [ ] `multiple_selections` ("review before submitting" labeling).
 - [ ] `grouping` (click-to-assign pool↔bins; bins labelled from `groups` keys).
 - [ ] `matching` (assign right→left; **auto-match only on forward assignment leaving one pair**; announce it).
-- [ ] `ordering` (up/down + drag; deterministic reshuffle-if-equal; move announcements).
+- [ ] `ordering` (move up/down; deterministic reshuffle-if-equal; move announcements).
 - [ ] Shared `interacted`-flag + status logic (not-answered / in-progress / answered), shape+label icons (§6).
 - [ ] Per-action announcements through the two `aria-live` regions (§4.6).
-- [ ] Drag is additive-only over the click baseline; ≥24px targets.
+- [ ] Click-to-assign is the sole (accessible) interaction for grouping/matching/ordering; ≥24px targets. (No drag.)
 - [ ] Widget lifecycle seam (mount-once-and-cache per question, rehydrate from `app.answers`) + per-type module registry (`render/isInteracted/isComplete/statusOf/score`).
 **Deliverable:** every type fully answerable and individually gradable.
 

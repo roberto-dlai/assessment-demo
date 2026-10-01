@@ -1,5 +1,7 @@
 You are a senior product engineer helping me write a detailed spec for a web-based assessment tool.
 
+> **Note (historical brief).** This is the original prompt. Some decisions have since changed — notably: **no auto-advance** (the learner advances with Back/Next or the question navigator) and **no drag-and-drop** (grouping/matching use accessible click-to-select-then-place). See `SPEC.md` for the authoritative current scope.
+
 ## Goal
 Build a static web app, deployable to GitHub Pages (or a similarly simple host), that delivers an assessment/quiz.
 
@@ -44,8 +46,8 @@ Read the JSON carefully before writing the spec, and account for its actual shap
 Don't write the spec yet. First, ask me clarifying questions about anything ambiguous or unspecified. Cover at least:
 - **Data & authoring** — how questions are authored and loaded; whether the challenge/scenario grouping drives the UI; how the missing points field should be handled; how much the exposed-answer-key risk matters
 - **Scoring** — partial credit rules for grouping/matching/ordering and multi-select; how points roll up
-- **Flow & state** — whether answers can be changed after auto-advance; what counts as "answered" per type; timing/time limits
+- **Flow & state** — whether answers remain editable; what counts as "answered" per type; timing/time limits
 - **Persistence** — whether progress survives a page reload
-- **Accessibility & mobile** — keyboard/screen-reader support for drag-style interactions; touch/mobile support
+- **Accessibility & mobile** — keyboard/screen-reader support for the item-assignment interactions; touch/mobile support
 
 Group your questions by topic, and suggest a sensible default for each so I can just confirm. Once I've answered, write the full spec.
