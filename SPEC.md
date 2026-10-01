@@ -108,7 +108,7 @@ Layout: a horizontal question navigator across the top of the quiz, with the que
 
 - **Challenge scenario header** above the first question of each challenge (and shown as context on each question within that challenge, e.g., a persistent banner).
 - **Question panel:** challenge label (e.g., "Challenge 2 · Question 2 of 3"), point value badge ("1 point"), the `prompt`, and the type-specific interaction (§4).
-- **Controls:** Back, Next, and Submit (Submit enabled at any time; confirms if unanswered questions remain).
+- **Controls:** Back (left) and the forward action on the right — **Next** on every question except the last, where **Submit** replaces it. Submit confirms if unanswered questions remain (§3.3). The navigator still lets the learner jump anywhere, so reaching the last question to submit is always one click away.
 - **Navigator:** grouped by challenge; each entry is a real `<button>` showing question number + status icon (§6) + an `aria-label` naming the state; `aria-current="true"` marks the active question. Activating an entry jumps to that question and **moves focus to the target question's heading** (not into an input).
 - **Navigator keyboard model:** the navigator is a single tab stop (roving tabindex) whose tabbable button is the current question; Arrow keys (and Home/End) move between question buttons, so Tab reaches the question panel in one step.
 - Progress indicator: answered count / total.

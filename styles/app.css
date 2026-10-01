@@ -431,8 +431,8 @@ body {
   flex-wrap: wrap;
   gap: 0.75rem;
 }
-.controls .dl-btn:last-child {
-  margin-left: auto; /* push Submit to the end */
+.controls .dl-btn:first-child {
+  margin-right: auto; /* keep Back on the left; the forward action sits on the right */
 }
 .dl-btn:disabled {
   opacity: 0.45;

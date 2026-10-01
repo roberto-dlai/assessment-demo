@@ -207,8 +207,10 @@ export function renderQuiz(root, app) {
       ref.btn.classList.toggle("nav-item--active", active);
     }
     setRoving(index); // keep the navigator's single tab stop on the current question
+    const isLast = index === total - 1;
     backBtn.disabled = index === 0;
-    nextBtn.disabled = index === total - 1;
+    nextBtn.hidden = isLast; // Submit replaces Next on the last question
+    submitBtn.hidden = !isLast;
 
     focusHeading(prompt);
   }
