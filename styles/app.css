@@ -478,10 +478,10 @@ body {
   cursor: pointer;
 }
 .nav-item--active {
-  border-color: var(--dl-coral);
+  border-color: var(--dl-teal);
   font-weight: 600;
-  background: #fdecee; /* light coral tint (no coral-tint token exists in theme.css) */
-  box-shadow: inset 0 0 0 2px var(--dl-coral); /* 2px ring with no layout shift (vs changing border-width) */
+  background: color-mix(in srgb, var(--dl-teal) 12%, var(--dl-white)); /* teal tint */
+  box-shadow: inset 0 0 0 2px var(--dl-teal); /* 2px ring with no layout shift */
 }
 .nav-item__icon {
   font-weight: 700; /* bolder glyph for legibility (esp. the coral ✓) */

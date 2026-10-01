@@ -16,7 +16,7 @@ import { questionRng } from "../util/prng.js";
 const STATUS = {
   "not-answered": { shape: "○", label: "not answered" },
   "in-progress": { shape: "◐", label: "in progress" },
-  answered: { shape: "✓", label: "answered" },
+  answered: { shape: "●", label: "answered" },
 };
 
 export function renderQuiz(root, app) {
