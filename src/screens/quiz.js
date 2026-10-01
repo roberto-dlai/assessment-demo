@@ -6,11 +6,12 @@
 // mounted lazily into its own cached container and toggled with `hidden`, so
 // navigating away and back preserves its DOM and rehydrates from `app.answers`.
 
-import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
 import { announce, focusHeading } from "../util/a11y.js";
 import { widgetFor } from "../questions/registry.js";
 import { questionRng } from "../util/prng.js";
+import { openModal } from "./modal.js";
+import { grade } from "../scoring.js";
 
 // Status shapes carry meaning without relying on color (SPEC §6).
 const STATUS = {
@@ -227,7 +228,22 @@ export function renderQuiz(root, app) {
   // ---- Wire controls ----
   backBtn.addEventListener("click", () => goTo(app.currentIndex - 1));
   nextBtn.addEventListener("click", () => goTo(app.currentIndex + 1));
-  submitBtn.addEventListener("click", () => app.go(SCREENS.RESULTS));
+  submitBtn.addEventListener("click", () => {
+    const incomplete = total - app.answeredCount();
+    const message =
+      incomplete > 0
+        ? `${incomplete} question${incomplete === 1 ? " is" : "s are"} not complete. Submit anyway? You won't be able to change your answers.`
+        : "Submit your answers? You won't be able to change them.";
+    openModal({
+      title: "Submit assessment",
+      message,
+      actions: [
+        { label: "Submit", variant: "primary", onClick: () => app.submit(grade(app)) },
+        { label: "Keep working", variant: "secondary", onClick: () => {} },
+      ],
+      onCancel: () => {},
+    });
+  });
 
   // ---- Initial paint ----
   refreshAllNav();

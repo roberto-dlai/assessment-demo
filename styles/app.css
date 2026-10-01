@@ -524,6 +524,144 @@ body {
   color: var(--dl-teal);
 }
 
+/* ===================== Submit modal ===================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal {
+  background: var(--dl-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 28rem;
+  width: 100%;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.modal__title {
+  margin: 0;
+}
+.modal__message {
+  margin: 0;
+}
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* ===================== Results screen ===================== */
+.results-summary {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.results-summary__score {
+  margin: 0;
+  font-family: var(--dl-font-heading);
+  font-weight: 600;
+  font-size: var(--dl-fs-subhead);
+}
+.results-summary__counts {
+  margin: 0;
+  color: var(--app-text-muted);
+}
+.results-summary__challenges {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--app-text-muted);
+}
+.results-challenge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+.results-challenge__scenario {
+  margin: 0;
+  background: var(--dl-bg-featured);
+  color: var(--dl-text-on-dark);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+}
+.rcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid #eee;
+  border-left: 4px solid #ccc;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+.rcard__prompt {
+  margin: 0;
+  font-weight: 600;
+}
+.rcard__outcome {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+.rcard__icon {
+  font-weight: 700;
+}
+.rcard--correct {
+  border-left-color: var(--dl-teal);
+}
+.rcard--correct .rcard__outcome {
+  color: var(--dl-teal);
+}
+.rcard--partial {
+  border-left-color: #8a6a00;
+}
+.rcard--partial .rcard__outcome {
+  color: #8a6a00;
+}
+.rcard--incorrect {
+  border-left-color: var(--dl-magenta);
+}
+.rcard--incorrect .rcard__outcome {
+  color: var(--dl-magenta);
+}
+.rcard--not-answered {
+  border-left-color: var(--app-text-muted);
+}
+.rcard--not-answered .rcard__outcome {
+  color: var(--app-text-muted);
+}
+.rcard__answer-title {
+  margin: 0 0 0.2rem;
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+}
+.rcard__answer-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.rcard__behavior {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+}
+
 /* Accessibility helpers */
 .sr-only {
   position: absolute;

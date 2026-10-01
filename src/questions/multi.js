@@ -52,3 +52,13 @@ export function score(answer, question) {
   }
   return Math.max(0, (selCorrect - selWrong) / totalCorrect);
 }
+
+// ---- Results review helpers ----
+export function describeSolution(question) {
+  return question.options.filter((o) => o.correct).map((o) => o.label);
+}
+export function describeAnswer(answer, question) {
+  const sel = new Set(answer || []);
+  const labels = question.options.filter((o) => sel.has(o.id)).map((o) => o.label);
+  return labels.length ? labels : ["(no answer)"];
+}

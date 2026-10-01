@@ -81,3 +81,14 @@ export function score(answer, question) {
   for (let i = 0; i < sol.length; i++) if (answer[i] === sol[i]) correct++;
   return correct / sol.length;
 }
+
+// ---- Results review helpers ----
+export function describeSolution(question) {
+  // question.items are already in the correct order
+  return question.items.map((it, i) => `${i + 1}. ${it.label}`);
+}
+export function describeAnswer(answer, question) {
+  if (!answer) return ["(no answer)"];
+  const byId = new Map(question.items.map((it) => [it.id, it.label]));
+  return answer.map((id, i) => `${i + 1}. ${byId.get(id)}`);
+}

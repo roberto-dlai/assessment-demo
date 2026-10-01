@@ -142,3 +142,12 @@ export function score(answer, question) {
   for (const it of question.items) if (answer[it.id] === it.correctGroup) correct++;
   return correct / question.items.length;
 }
+
+// ---- Results review helpers ----
+export function describeSolution(question) {
+  return question.items.map((it) => `${it.label} → ${it.correctGroup}`);
+}
+export function describeAnswer(answer, question) {
+  if (!answer || !Object.keys(answer).length) return ["(no answer)"];
+  return question.items.map((it) => `${it.label} → ${answer[it.id] || "(unplaced)"}`);
+}

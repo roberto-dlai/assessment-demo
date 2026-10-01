@@ -106,6 +106,22 @@ export function createApp(onChange) {
       for (const q of this.model.questions) if (this.statusOf(q.uid) === "answered") n++;
       return n;
     },
+    /** Finalize: store results and route to the results screen (M4). */
+    submit(results) {
+      this.results = results;
+      this.submitted = true;
+      return this.go(SCREENS.RESULTS);
+    },
+    /** Clear in-quiz state for a fresh attempt (Retake). */
+    reset() {
+      this.answers = new Map();
+      this.interacted = new Set();
+      this.resolvedOrderings = new Map();
+      this.currentIndex = 0;
+      this.submitted = false;
+      this.results = null;
+      return this;
+    },
     fail(error) {
       this.error = error instanceof Error ? error : new Error(String(error));
       this.screen = SCREENS.ERROR;

@@ -182,3 +182,14 @@ export function score(answer, question) {
   for (const l of question.lefts) if (answer[l.id] === question.solution[l.id]) correct++;
   return correct / question.lefts.length;
 }
+
+// ---- Results review helpers ----
+export function describeSolution(question) {
+  const rl = new Map(question.rights.map((r) => [r.id, r.label]));
+  return question.lefts.map((l) => `${l.label} → ${rl.get(question.solution[l.id])}`);
+}
+export function describeAnswer(answer, question) {
+  if (!answer || !Object.keys(answer).length) return ["(no answer)"];
+  const rl = new Map(question.rights.map((r) => [r.id, r.label]));
+  return question.lefts.map((l) => `${l.label} → ${answer[l.id] ? rl.get(answer[l.id]) : "(none)"}`);
+}

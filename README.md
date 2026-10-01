@@ -33,8 +33,17 @@ interactive: single/multi-select (radios/checkboxes); grouping (group bins + an
 — click-to-match, one-to-one, auto-matches the final pair); and ordering (move
 up/down). All click-to-select-then-place — no native drag, so it's keyboard- and
 touch-operable. Per-type status (not-answered / in-progress / answered) and
-partial-credit scoring are implemented and unit tested. Submit appears on the
-last question; score aggregation + the results screen land in M4.
+partial-credit scoring are implemented and unit tested.
+
+**M4 — Scoring & results: complete.** Submit appears on the last question and
+opens a confirmation modal (warns about incomplete questions; focus-trapped,
+Escape/backdrop to cancel). On confirm, `scoring.js` grades every question
+(delegating to the per-type `score`), rolls up totals, percentage, and
+per-challenge subtotals, and the results screen shows a score summary plus a
+per-question review (your answer, the canonical correct answer, and outcome as
+shape+label — ✓ correct / ◐ partial / ✕ incorrect / ○ not answered). Retake
+clears state and returns to the start. Persistence of progress/results across
+reloads is M5.
 
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`).

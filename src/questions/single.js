@@ -44,3 +44,14 @@ export function score(answer, question) {
   const opt = question.options.find((o) => o.id === answer);
   return opt && opt.correct ? 1 : 0;
 }
+
+// ---- Results review helpers (return arrays of display lines) ----
+export function describeSolution(question) {
+  const correct = question.options.find((o) => o.correct);
+  return [correct ? correct.label : ""];
+}
+export function describeAnswer(answer, question) {
+  if (!answer) return ["(no answer)"];
+  const opt = question.options.find((o) => o.id === answer);
+  return [opt ? opt.label : "(unknown)"];
+}

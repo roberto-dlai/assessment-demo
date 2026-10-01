@@ -1,21 +1,108 @@
-// Results screen (SPEC §3.4).
-// M0 placeholder — scoring and the per-question review are built in M4.
+// Results screen (SPEC §3.4): score summary + per-challenge, per-question review
+// with the learner's answer, the canonical correct solution, and outcome (shape +
+// label, not color alone). Read-only; Retake clears state and returns to start.
 
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
-import { announce, focusHeading } from "../util/a11y.js";
+import { focusHeading, announce } from "../util/a11y.js";
+import { widgetFor } from "../questions/registry.js";
+import { grade } from "../scoring.js";
+import { startFresh } from "../session.js";
+
+const OUTCOME = {
+  correct: { shape: "✓", label: "Correct" },
+  partial: { shape: "◐", label: "Partial" },
+  incorrect: { shape: "✕", label: "Incorrect" },
+  "not-answered": { shape: "○", label: "Not answered" },
+};
+
+const fmt = (n) => String(Math.round(n * 100) / 100); // 0.6667 -> "0.67", 1 -> "1"
 
 export function renderResults(root, app) {
+  const { model } = app;
+  const r = app.results || grade(app); // recompute if arrived without stored results
+
   const section = mountScreen(root, "results");
+  const h1 = heading("Your results");
+  section.append(h1, summaryBlock(r));
 
-  const h1 = heading("Results");
-  const note = el("p", "", "Scoring and per-question review arrive in M4.");
+  for (const ch of model.challenges) {
+    if (!ch.questions.length) continue;
+    section.append(challengeBlock(ch, r, app));
+  }
 
-  const retake = el("button", "dl-btn dl-btn--primary", "Back to start");
+  const actions = el("div", "actions");
+  const retake = el("button", "dl-btn dl-btn--primary", "Retake");
   retake.type = "button";
-  retake.addEventListener("click", () => app.go(SCREENS.INSTRUCTIONS));
+  retake.addEventListener("click", () => {
+    app.setSessionSeed(startFresh(model.fingerprint));
+    app.reset();
+    app.go(SCREENS.INSTRUCTIONS);
+  });
+  actions.append(retake);
+  section.append(actions);
 
-  section.append(h1, note, retake);
   focusHeading(h1);
-  announce("Results.", { assertive: true });
+  announce(
+    `Results: ${fmt(r.totalEarned)} of ${r.totalPossible} points, ${r.percentage} percent.`,
+    { assertive: true }
+  );
+}
+
+function summaryBlock(r) {
+  const wrap = el("section", "results-summary");
+  wrap.setAttribute("aria-label", "Score summary");
+  wrap.append(
+    el("p", "results-summary__score", `${fmt(r.totalEarned)} / ${r.totalPossible} points · ${r.percentage}%`)
+  );
+  const c = r.counts;
+  wrap.append(
+    el(
+      "p",
+      "results-summary__counts",
+      `${c.correct} correct · ${c.partial} partial · ${c.incorrect} incorrect · ${c["not-answered"]} not answered`
+    )
+  );
+  const ul = el("ul", "results-summary__challenges");
+  for (const ch of r.byChallenge) {
+    ul.append(el("li", "", `Challenge ${ch.challenge}: ${fmt(ch.earned)} / ${ch.possible}`));
+  }
+  wrap.append(ul);
+  return wrap;
+}
+
+function challengeBlock(ch, r, app) {
+  const sec = el("section", "results-challenge");
+  sec.append(el("h2", "", `Challenge ${ch.challenge_number}`));
+  if (ch.scenario) sec.append(el("p", "results-challenge__scenario", ch.scenario));
+  for (const q of ch.questions) sec.append(questionCard(q, r.byUid.get(q.uid), app));
+  return sec;
+}
+
+function questionCard(q, res, app) {
+  const mod = widgetFor(q.type);
+  const o = OUTCOME[res.outcome];
+
+  const card = el("article", `rcard rcard--${res.outcome}`);
+  card.append(el("p", "rcard__prompt", q.prompt));
+
+  const outcome = el("p", "rcard__outcome");
+  const icon = el("span", "rcard__icon", o.shape);
+  icon.setAttribute("aria-hidden", "true");
+  outcome.append(icon, el("span", "", `${o.label} — ${fmt(res.earned)} of ${q.points} pt`));
+  card.append(outcome);
+
+  card.append(answerList("Your answer", mod.describeAnswer(app.answers.get(q.uid), q)));
+  card.append(answerList("Correct answer", mod.describeSolution(q)));
+  if (q.behavior) card.append(el("p", "rcard__behavior", `Skill: ${q.behavior}`));
+  return card;
+}
+
+function answerList(title, lines) {
+  const wrap = el("div", "rcard__answer");
+  wrap.append(el("p", "rcard__answer-title", title));
+  const ul = el("ul", "rcard__answer-list");
+  for (const line of lines) ul.append(el("li", "", line));
+  wrap.append(ul);
+  return wrap;
 }
