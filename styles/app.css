@@ -227,7 +227,8 @@ body {
   border-radius: 12px;
 }
 .navigator__group {
-  flex: none; /* keep each challenge's buttons together; don't shrink */
+  flex: 1 1 0; /* groups share the full width evenly (no white space on the right) */
+  min-width: 0;
 }
 .navigator__group + .navigator__group {
   border-left: 1px solid #eee;
@@ -249,9 +250,15 @@ body {
   flex-wrap: nowrap;
   gap: 0.2rem;
 }
+.navigator__item {
+  flex: 1 1 0; /* each list item grows so its button fills the group width */
+  min-width: 0;
+  display: flex;
+}
 .nav-item {
   display: inline-flex;
-  flex-direction: column; /* icon on top, number below → narrow square buttons */
+  flex: 1 1 0; /* buttons stretch to fill their group's width */
+  flex-direction: column; /* icon on top, number below */
   align-items: center;
   justify-content: center;
   gap: 0.05rem;
