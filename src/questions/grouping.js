@@ -20,10 +20,10 @@ export function render(container, { question, app, rng, onChange, announce }) {
 
   const root = el("div", "pickplace");
   root.append(el("p", "pickplace__hint", "Select an item, then choose a group to place it in."));
+  const bins = el("div", "bins");
   const pool = el("ul", "pool"); // unplaced items as loose chips (no box/label)
   pool.setAttribute("aria-label", "Unplaced items");
-  const bins = el("div", "bins");
-  root.append(pool, bins);
+  root.append(bins, pool); // groups above, unplaced items below
 
   const itemsIn = (group) => display.filter((it) => (current[it.id] || POOL) === group);
 
