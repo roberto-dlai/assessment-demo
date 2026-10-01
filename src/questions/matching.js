@@ -57,7 +57,8 @@ export function render(container, { question, app, rng, onChange, announce }) {
     if (openLefts.length === 1 && freeRights.length === 1) {
       current[openLefts[0].id] = freeRights[0].id;
       announce(
-        `Last pair matched automatically: ${lLabel.get(openLefts[0].id)} with ${rLabel.get(freeRights[0].id)}.`
+        `Last pair matched automatically: ${lLabel.get(openLefts[0].id)} with ${rLabel.get(freeRights[0].id)}.`,
+        { assertive: true } // system event (SPEC §4.6) + separate region avoids clobbering the "Matched" message
       );
     }
   }
@@ -73,6 +74,7 @@ export function render(container, { question, app, rng, onChange, announce }) {
   }
 
   function removeMatch(leftId) {
+    selected = null; // avoid a stranded selection after repaint
     delete current[leftId];
     app.setAnswer(uid, { ...current });
     announce(`Unmatched ${lLabel.get(leftId)}.`);
@@ -153,7 +155,9 @@ export function render(container, { question, app, rng, onChange, announce }) {
     for (const r of rightOrder) {
       const n = num.get("right:" + r.id);
       const left = n != null ? leftMatchedTo(r.id) : null;
-      const suffix = left ? `, matched with ${lLabel.get(left.id)} (pair ${n})` : ", not matched";
+      const suffix = left
+        ? `, matched with ${lLabel.get(left.id)} (pair ${n}); unmatch it from the Items column`
+        : ", not matched";
       const li = el("li", "match__row");
       li.append(makeItem("right", r.id, r.label, n, suffix));
       rightCol.append(li);

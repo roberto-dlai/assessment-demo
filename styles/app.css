@@ -301,12 +301,13 @@ body {
   position: absolute;
   top: 2px;
   right: 2px;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   min-width: 0;
   min-height: 0;
   padding: 0;
   border: none;
+  border-radius: 6px;
   background: transparent;
   color: var(--app-text-muted);
   font: inherit;
@@ -316,6 +317,10 @@ body {
 }
 .chip__remove:hover {
   color: var(--dl-magenta);
+  background: color-mix(in srgb, var(--dl-magenta) 10%, var(--dl-white));
+}
+.chip__remove:focus-visible {
+  outline-offset: -2px; /* keep the ring inside the chip bounds, not clipped */
 }
 
 /* Matching: two columns (items | options) */

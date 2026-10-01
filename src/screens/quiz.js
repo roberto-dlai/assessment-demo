@@ -179,7 +179,7 @@ export function renderQuiz(root, app) {
         refreshNav(q.uid);
         updateProgress();
       },
-      announce: (msg) => announce(msg),
+      announce: (msg, opts) => announce(msg, opts),
     });
     answerArea.append(node);
     widgetNodes.set(q.uid, node);
@@ -220,7 +220,8 @@ export function renderQuiz(root, app) {
     showQuestion(app.currentIndex);
     // Announce position POLITELY so it doesn't fight the focus-driven heading read.
     const m = qMeta.get(model.questions[app.currentIndex].uid);
-    announce(`Question ${app.currentIndex + 1} of ${total}. Challenge ${m.challenge}.`);
+    const lastNote = app.currentIndex === total - 1 ? " Last question — use Submit to finish." : "";
+    announce(`Question ${app.currentIndex + 1} of ${total}. Challenge ${m.challenge}.${lastNote}`);
   }
 
   // ---- Wire controls ----
