@@ -30,7 +30,6 @@ Read the JSON carefully before writing the spec, and account for its actual shap
 - Back and Next buttons
 - A way to jump to any question in any order (e.g., a question navigator)
 - An icon marking each question as answered — define what counts as "answered" for each type (especially the compound types: multi-select, grouping, matching, ordering)
-- Auto-advance to the next question once a question is answered — define the trigger consistently with the "answered" definition above, and specify behavior for compound types where completion is gradual
 - For matching questions, automatically match the final remaining pair once all others are matched
 - Each question should display its point value (resolve the points question above first)
 

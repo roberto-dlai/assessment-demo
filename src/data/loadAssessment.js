@@ -96,11 +96,13 @@ export function normalizeAssessment(raw) {
   // Reject duplicate question ids: they'd break per-question keying (rng streams,
   // answer state) even though the synthetic `uid` is index-based and unique.
   const byId = new Map();
+  const byUid = new Map();
   for (const q of questions) {
     if (byId.has(q.id)) {
       throw new Error(`Duplicate question id "${q.id}" — question ids must be unique.`);
     }
     byId.set(q.id, q);
+    byUid.set(q.uid, q);
   }
 
   return {
@@ -108,6 +110,7 @@ export function normalizeAssessment(raw) {
     challenges,
     questions,
     byId,
+    byUid,
     fingerprint: fingerprintQuestions(questions),
     counts: {
       challenges: challenges.length,

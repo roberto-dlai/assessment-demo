@@ -6,9 +6,16 @@ import { createApp, SCREENS } from "../src/state.js";
 
 function appWith(nQuestions) {
   const app = createApp(() => {});
-  app.setModel({
-    questions: Array.from({ length: nQuestions }, (_, i) => ({ uid: `q${i}`, index: i })),
-  });
+  const questions = Array.from({ length: nQuestions }, (_, i) => ({
+    uid: `q${i}`,
+    index: i,
+    type: "single_selection",
+    options: [
+      { id: `q${i}-a`, label: "a", correct: true },
+      { id: `q${i}-b`, label: "b", correct: false },
+    ],
+  }));
+  app.setModel({ questions, byUid: new Map(questions.map((q) => [q.uid, q])) });
   return app;
 }
 
@@ -22,7 +29,7 @@ test("setIndex clamps to valid range", () => {
 
 test("setIndex is safe when there are zero questions", () => {
   const app = createApp(() => {});
-  app.setModel({ questions: [] });
+  app.setModel({ questions: [], byUid: new Map() });
   assert.equal(app.setIndex(0), 0);
   assert.equal(app.setIndex(5), 0);
   assert.equal(app.currentIndex, 0);
@@ -44,15 +51,14 @@ test("currentQuestion tracks the index", () => {
   assert.equal(app.currentQuestion().uid, "q2");
 });
 
-test("statusOf reflects interaction; answeredCount aggregates", () => {
+test("statusOf delegates to the question type; answeredCount counts answered", () => {
   const app = appWith(3);
   assert.equal(app.statusOf("q0"), "not-answered");
   assert.equal(app.answeredCount(), 0);
-  app.setAnswer("q0", { choice: "a" });
+  app.setAnswer("q0", "q0-a");
   assert.equal(app.statusOf("q0"), "answered");
-  assert.equal(app.answers.get("q0").choice, "a");
-  app.markInteracted("q1");
-  assert.equal(app.statusOf("q1"), "answered");
+  assert.equal(app.answers.get("q0"), "q0-a");
+  app.setAnswer("q1", "q1-b");
   assert.equal(app.answeredCount(), 2);
 });
 

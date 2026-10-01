@@ -24,8 +24,16 @@ in-memory fallback, and a GitHub Pages deploy workflow.
 full re-render), question panel (scenario banner, challenge/point meta,
 prompt), Back/Next + a compact full-width horizontal navigator (grouped by
 challenge, roving tabindex, status icons, jump-to), and a progress indicator.
-The per-type answer widgets and scoring are the placeholders that land in
-M3–M4.
+**M3 — Question types: core complete.** Per-type module registry
+(`src/questions/*`) with a uniform `render`/`statusOf`/`score` interface, mounted
+through a lazy mount-once-and-cache widget lifecycle in the quiz screen
+(answers rehydrate from `app.answers` on revisit). All five types are
+interactive: single/multi-select (radios/checkboxes), grouping and matching
+(accessible labelled selects; matching enforces one-to-one and auto-matches the
+final pair), and ordering (move up/down). Per-type status (not-answered /
+in-progress / answered) and partial-credit scoring are implemented and unit
+tested. Drag-and-drop is a future enhancement over the accessible baseline;
+score aggregation + the results screen land in M4.
 
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`).
@@ -67,19 +75,21 @@ data/
   spec-driven-development-assessment.json   # example assessment
 src/
   main.js                  # bootstrap + screen router
-  state.js                 # app state + screen keys
+  state.js                 # app state + in-quiz answer state (status via registry)
+  session.js               # per-assessment session seed (fingerprint-scoped)
   data/loadAssessment.js   # load, validate, normalize, flatten, fingerprint
   util/prng.js             # mulberry32 seeded PRNG + helpers
   util/shuffle.js          # deterministic shuffles
-  util/a11y.js             # announce() + focusHeading() live-region helpers
+  util/storage.js          # safe localStorage wrapper (in-memory fallback)
+  util/a11y.js             # announce / focusHeading / createFocusTrap
+  questions/               # per-type modules: render / statusOf / score
+    registry.js            #   type -> module
+    single.js  multi.js  grouping.js  matching.js  ordering.js
   screens/
     dom.js                 # shared el()/mountScreen()/heading() helpers
-    instructions.js        # instructions / quiz / results / error
-    quiz.js                #   (screens are placeholders until M1-M4)
-    results.js
-    error.js
+    instructions.js  quiz.js  results.js  error.js
 test/
-  util.test.js             # M0 unit tests (19)
+  util.test.js  state.test.js  persistence.test.js  questions.test.js  (42 tests)
 ```
 
 All asset paths are **relative** so the app works from a GitHub Pages project

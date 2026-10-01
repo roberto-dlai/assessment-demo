@@ -1,21 +1,16 @@
 // Quiz screen (SPEC §3.2).
 //
-// Built ONCE on route entry, then patched in place — navigation and (in M3)
-// answer changes mutate existing DOM nodes rather than re-rendering, so focus
-// and in-progress inputs are never destroyed. The type-specific answer widgets
-// are placeholders here and land in M3.
+// Built ONCE on route entry, then patched in place — navigation and answer
+// changes mutate existing DOM nodes rather than re-rendering, so focus and
+// in-progress inputs are never destroyed. Each question's answer widget is
+// mounted lazily into its own cached container and toggled with `hidden`, so
+// navigating away and back preserves its DOM and rehydrates from `app.answers`.
 
 import { SCREENS } from "../state.js";
 import { el, mountScreen, heading } from "./dom.js";
 import { announce, focusHeading } from "../util/a11y.js";
-
-const TYPE_NOUN = {
-  single_selection: "multiple-choice",
-  multiple_selections: "multiple-choice",
-  grouping: "grouping",
-  matching: "matching",
-  ordering: "ordering",
-};
+import { widgetFor } from "../questions/registry.js";
+import { questionRng } from "../util/prng.js";
 
 // Status shapes carry meaning without relying on color (SPEC §6).
 const STATUS = {
@@ -165,7 +160,34 @@ export function renderQuiz(root, app) {
   }
   function refreshAllNav() {
     for (const q of model.questions) refreshNav(q.uid);
+    updateProgress();
+  }
+  function updateProgress() {
     progress.textContent = `${app.answeredCount()} of ${total} answered`;
+  }
+
+  // ---- Answer widgets (mounted lazily, cached, toggled with `hidden`) ----
+  const widgetNodes = new Map(); // uid -> widget container element
+  function mountWidget(q) {
+    const node = el("div", "widget");
+    node.hidden = true;
+    widgetFor(q.type).render(node, {
+      question: q,
+      app,
+      rng: questionRng(app.sessionSeed, q.uid),
+      onChange: () => {
+        refreshNav(q.uid);
+        updateProgress();
+      },
+      announce: (msg) => announce(msg),
+    });
+    answerArea.append(node);
+    widgetNodes.set(q.uid, node);
+    return node;
+  }
+  function showWidget(q) {
+    if (!widgetNodes.has(q.uid)) mountWidget(q);
+    for (const [uid, node] of widgetNodes) node.hidden = uid !== q.uid;
   }
 
   function showQuestion(index) {
@@ -176,7 +198,7 @@ export function renderQuiz(root, app) {
     metaLine.textContent = `Challenge ${m.challenge} · Question ${m.pos} of ${m.size}`;
     badge.textContent = `${q.points} point${q.points === 1 ? "" : "s"}`;
     prompt.textContent = q.prompt;
-    answerArea.textContent = `Answer options for this ${TYPE_NOUN[q.type]} question appear here (M3).`;
+    showWidget(q);
 
     for (const [uid, ref] of navRefs) {
       const active = uid === q.uid;

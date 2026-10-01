@@ -1,8 +1,9 @@
-// Minimal app state + screen routing (SPEC §3 flow).
+// App state + screen routing (SPEC §3 flow).
 //
-// M0 scope: hold the loaded model and the current screen, and notify a
-// listener to re-render on screen changes. Answer state, persistence, and
-// grading arrive in later milestones (M3–M5).
+// Holds the loaded model, the current screen, and in-quiz answer state. Per-type
+// status is delegated to the question registry; persistence arrives in M5.
+
+import { widgetFor } from "./questions/registry.js";
 
 export const SCREENS = Object.freeze({
   INSTRUCTIONS: "instructions",
@@ -88,19 +89,21 @@ export function createApp(onChange) {
     },
 
     /**
-     * Status of a question for the navigator/icon (SPEC §6).
-     * M2: only not-answered vs answered (no answers exist yet). M3 refines this
-     * to add "in-progress" and per-type completeness.
+     * Status of a question for the navigator/icon (SPEC §6), delegated to the
+     * per-type module using the current answer payload.
      * @param {string} uid
      * @returns {"not-answered"|"in-progress"|"answered"}
      */
     statusOf(uid) {
-      return this.interacted.has(uid) ? "answered" : "not-answered";
+      const q = this.model && this.model.byUid.get(uid);
+      if (!q) return "not-answered";
+      return widgetFor(q.type).statusOf(this.answers.get(uid), q);
     },
+    /** Count of fully-answered questions (progress indicator). */
     answeredCount() {
       if (!this.model) return 0;
       let n = 0;
-      for (const q of this.model.questions) if (this.statusOf(q.uid) !== "not-answered") n++;
+      for (const q of this.model.questions) if (this.statusOf(q.uid) === "answered") n++;
       return n;
     },
     fail(error) {
