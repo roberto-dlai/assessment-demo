@@ -208,7 +208,7 @@ Follow the brand skill; use `theme.css` tokens rather than hardcoded hex.
   - **Outcome colors** reinforce the shape+label (§3.4/§6), never stand alone: correct = **teal** (not off-palette green); partial = an amber chip with a **dark glyph/label** (never yellow text); incorrect = **magenta `#DD3C66`** (reserved for "incorrect" so it stays distinct from coral's CTA/answered meaning).
 - **Typography:** Poppins (500/600) for headings, question prompts, CTAs; Open Sans (400/600) for body and options. Maintain headline ≈ 2× body hierarchy; scale fluidly.
 - **Voice:** friendly, encouraging, succinct. Motivate ("Nice work — here's how you did"); for incorrect/partial, explain the reasoning supportively, never at the learner's expense.
-- **Logo:** coral horizontal lockup on white header — **one color only, must read "DeepLearning.AI" (D/L/AI capitalized), no effects/distortion/recolor**. Placeholder until the official asset is provided.
+- **Logo:** the official DeepLearning.AI horizontal lockup (`dlai-logo.webp`, 256×57) in the white header, shown at 28px tall with preserved aspect and `alt="DeepLearning.AI"` — no distortion/recolor.
 - **Components:** rounded cards, soft tint-circle icons, generous spacing. **Point badge** uses the `.dl-tag` chip **with an app override** (light-teal fill `#e3f1f5` + darkest-teal text `#164C59` ≈ 9:1) because the brand's default `.dl-tag` (`#164C59` on `#32AFCC`) is only ~3.2:1 at 13px. One coral primary action per screen. Contrast AA throughout.
 
 ---

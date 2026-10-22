@@ -30,9 +30,9 @@ body {
   border-bottom: 1px solid #eee;
 }
 .site-header__logo {
-  font-family: var(--dl-font-heading);
-  font-weight: 600;
-  color: var(--dl-coral);
+  display: block;
+  height: 28px;
+  width: auto; /* preserve the 256×57 aspect */
 }
 
 .app {

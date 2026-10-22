@@ -63,8 +63,8 @@ trap + `inert` background; roving-tabindex navigator; two
 verified AA (point chip, status, outcome colors). The error screen has a **Try
 again** retry (§10). CTA semantics hold (one coral primary per screen).
 
-> The header shows a text wordmark ("DeepLearning.AI", coral); swap in the
-> official logo asset when available (SPEC §8).
+> The header shows the official DeepLearning.AI logo (`dlai-logo.webp`) at 28px
+> tall, with `alt="DeepLearning.AI"`.
 
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`; tests gated by CI).
