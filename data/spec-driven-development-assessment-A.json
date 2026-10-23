@@ -265,24 +265,6 @@
       "scenario": "As the practice spreads across the team, you look for ways to make the workflow faster, repeatable, and portable - so it isn't tied to any one agent or tool.",
       "questions": [
         {
-          "id": "6.1",
-          "type": "grouping",
-          "behavior": "Use agent skills to automate repeatable SDD workflows",
-          "prompt": "Agent skills are best for definable, repeatable workflows. Sort each task by whether it's a good candidate to package as a skill.",
-          "groups": {
-            "Good candidate for a skill": [
-              "The multi-step prompt you repeat to start every feature spec",
-              "Updating the changelog on each merge to main",
-              "A validation routine: update the README, lint, format, and write tests"
-            ],
-            "Not a good fit for a skill": [
-              "Deciding the product's overall mission and target audience",
-              "Making a one-time architecture choice unique to this project",
-              "Judging whether a risky new feature is worth building at all"
-            ]
-          }
-        },
-        {
           "id": "6.2",
           "type": "single_selection",
           "behavior": "Choose between MCP servers and CLI-plus-skills for extending an agent",
