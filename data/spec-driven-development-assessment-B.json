@@ -3,7 +3,6 @@
   "status": "draft",
   "audience": "Beginners to spec-driven and agentic coding workflows",
   "estimated_duration": "25-30 minutes",
-  "lead_scenario": "You've joined the engineering team at a startup building ContextCafe - the web app for a cozy neighborhood coffee shop, where regulars browse the seasonal menu, place mobile orders, and earn loyalty rewards. The team is retiring its ad-hoc vibe coding habits and adopting spec-driven development with an agentic coding assistant.",
   "skills_framework": [
     {
       "skill_area": "Foundations of Spec-Driven Development",
