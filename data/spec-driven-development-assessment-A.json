@@ -246,24 +246,6 @@
           ]
         },
         {
-          "id": "5.2",
-          "type": "grouping",
-          "behavior": "Keep specs and code in sync to prevent drift and reduce cognitive and AI fatigue",
-          "prompt": "Some working habits keep a spec-driven project's specs and code aligned; others let them drift apart. Sort each habit into the right group.",
-          "groups": {
-            "Keeps specs and code aligned": [
-              "Ask the agent to update related docs whenever the code changes",
-              "Work in small steps with frequent commits you can review",
-              "Record decisions in the spec, not just in the code"
-            ],
-            "Lets them drift apart": [
-              "Move files without telling the agent",
-              "Hand-edit the code and skip updating the specs",
-              "Let the README and specs lag behind the shipped code"
-            ]
-          }
-        },
-        {
           "id": "5.3",
           "type": "ordering",
           "behavior": "Introduce SDD to brownfield/legacy projects by reverse-engineering specs from existing artifacts",
