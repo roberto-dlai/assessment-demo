@@ -140,18 +140,6 @@
           ]
         },
         {
-          "id": "2.2",
-          "type": "matching",
-          "behavior": "Recognize the human's role as architect and supervisor who supplies context",
-          "prompt": "In spec-driven development you act as the architect while the agent does the building. Match each part of your role to what it involves.",
-          "pairs": [
-            {"left": "Design", "right": "Set the goals, constraints, and success criteria in the spec"},
-            {"left": "Supervise", "right": "Follow the agent's progress and steer it when it drifts"},
-            {"left": "Review", "right": "Accept the finished work or ask for changes"},
-            {"left": "Delegate", "right": "Leave low-level choices like variable names to the agent"}
-          ]
-        },
-        {
           "id": "2.3",
           "type": "grouping",
           "behavior": "Select the right level of detail to give an agent",
