@@ -37,14 +37,6 @@ export function renderInstructions(root, app) {
   }
   section.append(actions(root, app));
 
-  // Offer a way back to the picker when more than one assessment exists.
-  if (app.assessments && app.assessments.length > 1) {
-    const switchBtn = el("button", "linklike", "Choose a different assessment");
-    switchBtn.type = "button";
-    switchBtn.addEventListener("click", () => app.go(SCREENS.PICKER));
-    section.append(switchBtn);
-  }
-
   // Moving focus to the h1 makes the screen reader announce the title; a
   // separate announcement here would double-speak, so we rely on focus alone.
   focusHeading(h1);
