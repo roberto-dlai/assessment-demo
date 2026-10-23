@@ -110,23 +110,6 @@
           }
         },
         {
-          "id": "1.2",
-          "type": "grouping",
-          "behavior": "Explain the core benefits of specs",
-          "prompt": "Your teammate asks why writing specs is worth the effort. Group these as a benefit or not a benefit of spec-driven development with a coding agent.",
-          "groups": {
-            "Benefit": [
-              "Large code changes can be steered by small edits to the spec, cutting cognitive overhead",
-              "Essential context persists across sessions, keeping a stateless agent anchored as its window fills",
-              "Stating the problem and success criteria up front makes the agent's output match your intent"
-            ],
-            "Not a benefit": [
-              "A detailed enough spec guarantees correct code, so human review is no longer needed",
-              "Specs let the agent run fully autonomously, removing the need for any human decisions"
-            ]
-          }
-        },
-        {
           "id": "1.3",
           "type": "single_selection",
           "behavior": "Differentiate coding agents from chatbots",

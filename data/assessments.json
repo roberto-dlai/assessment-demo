@@ -7,8 +7,8 @@
   },
   {
     "id": "spec-driven-short",
-    "title": "Spec-Driven Development (short)",
-    "description": "6 challenges · shorter form",
-    "file": "data/spec-driven-development-assessment-short.json"
+    "title": "Spec-Driven Development — A",
+    "description": "Variant A · 6 challenges",
+    "file": "data/spec-driven-development-assessment-A.json"
   }
 ]
