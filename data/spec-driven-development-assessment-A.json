@@ -164,17 +164,6 @@
       "scenario": "It's time to write ContextCafe's constitution: the high-level agreement that will steer every future change. You sit down with the agent to draft it together.",
       "questions": [
         {
-          "id": "3.1",
-          "type": "matching",
-          "behavior": "Identify the three constitution pillars: mission, tech stack, and roadmap",
-          "prompt": "ContextCafe's constitution has three pillars. Match each pillar to the content it captures.",
-          "pairs": [
-            {"left": "Mission", "right": "The project's why: vision, audiences, and scope"},
-            {"left": "Tech stack", "right": "Agreed tools, frameworks, and infrastructure for development and deployment"},
-            {"left": "Roadmap", "right": "A living sequence of phases, each built as its own feature"}
-          ]
-        },
-        {
           "id": "3.2",
           "type": "ordering",
           "behavior": "Draft the constitution through human-in-the-loop conversation with the agent",
