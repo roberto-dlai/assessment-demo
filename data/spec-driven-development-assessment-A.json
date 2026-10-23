@@ -215,19 +215,6 @@
           }
         },
         {
-          "id": "4.2",
-          "type": "ordering",
-          "behavior": "Implement features in small, manageable steps with cleanly cleared context",
-          "prompt": "Put the steps of implementing a spec-driven feature in the order the course follows.",
-          "correct_order": [
-            "Clear the agent's context so it starts from the committed spec rather than stale memory",
-            "Prompt the agent to build the task groups defined in the feature plan",
-            "Watch the console output to follow the changes the agent makes as it works",
-            "Review the diff and, if it's wrong, ask the agent to fix it",
-            "Run the app to confirm the corrected feature works"
-          ]
-        },
-        {
           "id": "4.3",
           "type": "multiple_selections",
           "behavior": "Validate work as the human in the loop using review, tests, and sub-agent deep reviews",
