@@ -37,6 +37,14 @@ export function renderInstructions(root, app) {
   }
   section.append(actions(root, app));
 
+  // Offer a way back to the picker when more than one assessment exists.
+  if (app.assessments && app.assessments.length > 1) {
+    const switchBtn = el("button", "linklike", "Choose a different assessment");
+    switchBtn.type = "button";
+    switchBtn.addEventListener("click", () => app.go(SCREENS.PICKER));
+    section.append(switchBtn);
+  }
+
   // Moving focus to the h1 makes the screen reader announce the title; a
   // separate announcement here would double-speak, so we rely on focus alone.
   focusHeading(h1);
@@ -102,14 +110,14 @@ function howItWorks(persistent) {
 
 function actions(root, app) {
   const wrap = el("div", "actions");
-  const fingerprint = app.model.fingerprint;
+  const key = app.sessionKey;
 
-  if (hasSavedProgress(fingerprint)) {
+  if (hasSavedProgress(key)) {
     // Resume is the primary action; starting over is secondary (SPEC §3.1).
     const resume = primaryButton("Resume", () => app.go(SCREENS.QUIZ));
     const startOver = secondaryButton("Start over", () => {
       app.reset(); // clear in-memory answers/index/results
-      app.setSessionSeed(startFresh(fingerprint)); // clear storage + mint a new seed
+      app.setSessionSeed(startFresh(key)); // clear storage + mint a new seed
       // assertive region so it isn't clobbered by the quiz's polite "Question 1…"
       announce("Progress cleared. Starting over.", { assertive: true });
       app.go(SCREENS.QUIZ);

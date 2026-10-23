@@ -1,0 +1,14 @@
+[
+  {
+    "id": "spec-driven",
+    "title": "Spec-Driven Development with Agentic Coding",
+    "description": "6 challenges · ~25–30 minutes",
+    "file": "data/spec-driven-development-assessment.json"
+  },
+  {
+    "id": "spec-driven-short",
+    "title": "Spec-Driven Development (short)",
+    "description": "6 challenges · shorter form",
+    "file": "data/spec-driven-development-assessment-short.json"
+  }
+]

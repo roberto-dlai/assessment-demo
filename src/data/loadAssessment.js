@@ -23,6 +23,43 @@ const ALL_TYPES = new Set([
 ]);
 
 /**
+ * Fetch the assessment manifest (the list of selectable assessments).
+ * Returns null if it's absent/unreadable so callers can fall back to a single
+ * default assessment.
+ * @param {string} [path]
+ * @returns {Promise<Array<{id,title,file,description?}>|null>}
+ */
+export async function loadManifest(path = "data/assessments.json") {
+  try {
+    const res = await fetch(path, { cache: "no-cache" });
+    if (!res.ok) return null;
+    return normalizeManifest(await res.json());
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validate + normalize a manifest (pure, testable).
+ * @param {any} raw
+ * @returns {Array<{id,title,file,description?}>}
+ */
+export function normalizeManifest(raw) {
+  if (!Array.isArray(raw) || raw.length === 0) {
+    throw new Error("Manifest must be a non-empty array of assessments.");
+  }
+  const seen = new Set();
+  return raw.map((e, i) => {
+    const id = str(e && e.id, `assessments[${i}].id`);
+    const title = str(e && e.title, `assessments[${i}].title`);
+    const file = str(e && e.file, `assessments[${i}].file`);
+    if (seen.has(id)) throw new Error(`Duplicate assessment id "${id}" in manifest.`);
+    seen.add(id);
+    return { id, title, file, description: typeof e.description === "string" ? e.description : "" };
+  });
+}
+
+/**
  * Fetch and normalize the assessment at a relative path.
  * @param {string} [path]
  * @returns {Promise<object>} normalized assessment model

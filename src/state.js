@@ -9,6 +9,7 @@ import { widgetFor } from "./questions/registry.js";
 import { grade } from "./scoring.js";
 
 export const SCREENS = Object.freeze({
+  PICKER: "picker",
   INSTRUCTIONS: "instructions",
   QUIZ: "quiz",
   RESULTS: "results",

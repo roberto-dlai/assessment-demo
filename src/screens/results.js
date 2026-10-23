@@ -34,7 +34,7 @@ export function renderResults(root, app) {
   const retake = el("button", "dl-btn dl-btn--primary", "Retake");
   retake.type = "button";
   retake.addEventListener("click", () => {
-    app.setSessionSeed(startFresh(model.fingerprint));
+    app.setSessionSeed(startFresh(app.sessionKey));
     app.reset();
     app.go(SCREENS.INSTRUCTIONS);
   });

@@ -8,7 +8,7 @@
 
 ## 1. Overview
 
-A static, single-page web app that delivers a multi-challenge assessment loaded from a JSON file. It supports five question types, free navigation between questions, per-question point display, progress persistence across reloads, and a post-submission results view — all styled to DeepLearning.AI's brand.
+A static, single-page web app that delivers a multi-challenge assessment loaded from a JSON file. It supports selecting among multiple assessments (a manifest-driven picker + `?a=<id>` deep-link), five question types, free navigation between questions, per-question point display, progress persistence across reloads, and a post-submission results view — all styled to DeepLearning.AI's brand.
 
 **Non-goals:** authoring UI, user accounts/auth, a backend/API, server-side grading, analytics dashboards, multi-assessment libraries. The app loads one assessment JSON and runs it.
 
@@ -91,7 +91,7 @@ Per type:
 ## 3. Screens & flow
 
 ```
-Instructions ──▶ Quiz (question N of M) ──▶ Submit confirm ──▶ Results
+Picker (if >1 assessment) ──▶ Instructions ──▶ Quiz (question N of M) ──▶ Submit confirm ──▶ Results
                      ▲         │
                      └─ navigator / Back / Next ─┘
 ```

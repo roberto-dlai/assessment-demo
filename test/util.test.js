@@ -9,7 +9,11 @@ import { fileURLToPath } from "node:url";
 
 import { mulberry32, hashStringToSeed, questionRng, makeSessionSeed } from "../src/util/prng.js";
 import { shuffle, shuffleUntil, sameOrder } from "../src/util/shuffle.js";
-import { normalizeAssessment, fingerprintQuestions } from "../src/data/loadAssessment.js";
+import {
+  normalizeAssessment,
+  fingerprintQuestions,
+  normalizeManifest,
+} from "../src/data/loadAssessment.js";
 
 const DATA_PATH = fileURLToPath(
   new URL("../data/spec-driven-development-assessment.json", import.meta.url)
@@ -206,6 +210,22 @@ test("fingerprint detects answer-key drift for every type", () => {
   const q32 = ord.challenges[2].questions.find((q) => q.id === "3.2");
   [q32.correct_order[0], q32.correct_order[1]] = [q32.correct_order[1], q32.correct_order[0]];
   assert.notEqual(fp(ord), base, "reordering must change the fingerprint");
+});
+
+test("normalizeManifest validates entries and rejects bad input", () => {
+  const m = normalizeManifest([
+    { id: "a", title: "A", file: "data/a.json" },
+    { id: "b", title: "B", file: "data/b.json", description: "two" },
+  ]);
+  assert.equal(m.length, 2);
+  assert.deepEqual(m[0], { id: "a", title: "A", file: "data/a.json", description: "" });
+  assert.equal(m[1].description, "two");
+  assert.throws(() => normalizeManifest([]), /non-empty/);
+  assert.throws(() => normalizeManifest([{ id: "a", title: "A" }]), /file/); // missing file
+  assert.throws(
+    () => normalizeManifest([{ id: "x", title: "X", file: "x" }, { id: "x", title: "Y", file: "y" }]),
+    /Duplicate/
+  );
 });
 
 test("normalizeAssessment rejects malformed input", () => {

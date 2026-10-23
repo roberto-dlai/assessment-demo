@@ -69,6 +69,20 @@ again** retry (§10). CTA semantics hold (one coral primary per screen).
 **Live:** https://roberto-dlai.github.io/assessment-demo/ (auto-deploys from
 `main` via `.github/workflows/deploy-pages.yml`; tests gated by CI).
 
+## Choosing an assessment
+
+`data/assessments.json` is a manifest listing the selectable assessments
+(`{ id, title, description, file }`). On load:
+
+- with multiple assessments and no selection, a **picker** screen lists them;
+- `?a=<id>` deep-links straight to one (and the URL updates when you pick);
+- a single manifest entry (or no manifest) skips the picker and loads the default.
+
+Each assessment keeps its own progress — the saved session is namespaced by
+`id + content-fingerprint`, so distinct assessments never collide (even with
+identical content) and a content change still invalidates stale saves. Add an
+assessment by dropping its JSON in `data/` and adding a manifest entry.
+
 ## Running locally
 
 ES modules and `fetch()` are blocked under `file://`, so you **must** use a
@@ -103,7 +117,8 @@ index.html                 # entry; loads fonts, theme.css, styles, src/main.js
 theme.css                  # DeepLearning.AI brand tokens
 styles/app.css             # app layout/styles
 data/
-  spec-driven-development-assessment.json   # example assessment
+  assessments.json                          # manifest of selectable assessments
+  spec-driven-development-assessment.json    # example assessment(s)
 src/
   main.js                  # bootstrap + screen router
   state.js                 # app state + in-quiz answer state (status via registry)
@@ -119,7 +134,7 @@ src/
     single.js  multi.js  grouping.js  matching.js  ordering.js
   screens/
     dom.js                 # shared el()/mountScreen()/heading() helpers
-    modal.js  instructions.js  quiz.js  results.js  error.js
+    picker.js  modal.js  instructions.js  quiz.js  results.js  error.js
 test/
   util.test.js  state.test.js  persistence.test.js  persist-session.test.js
   questions.test.js  scoring.test.js   (53 tests)
