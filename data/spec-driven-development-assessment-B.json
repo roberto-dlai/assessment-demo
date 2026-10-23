@@ -88,7 +88,6 @@
   "challenges": [
     {
       "challenge_number": 1,
-      "scenario": "In your first week, a teammate is skeptical that changing how you prompt the agent even matters. To make the case, you need to be clear on what separates quick, prompt-and-hope coding from a disciplined spec-driven approach - and why it matters as the product grows.",
       "questions": [
         {
           "id": "1.1",
@@ -96,148 +95,238 @@
           "behavior": "Explain the core benefits of specs: controlling large changes with small edits, reducing context decay, and improving intent fidelity",
           "prompt": "What is the main advantage of Spec-Driven Development (SDD) compared to \"vibe coding\" with AI agents?",
           "options": [
-            {"label": "SDD lets the agent work fully autonomously without any human review or intermediate checkpoints, which removes communication overhead and speeds up every part of development.", "correct": false},
-            {"label": "SDD uses persistent specs to anchor intent across sessions, avoiding the drift that comes from long prompt dialogues.", "correct": true},
-            {"label": "SDD eliminates the need for version control since specifications replace git history.", "correct": false},
-            {"label": "SDD requires you to write all the code manually and only use the agent for small suggestions.", "correct": false}
+            {
+              "label": "SDD lets the agent work fully autonomously without any human review or intermediate checkpoints, which removes communication overhead and speeds up every part of development.",
+              "correct": false
+            },
+            {
+              "label": "SDD uses persistent specs to anchor intent across sessions, avoiding the drift that comes from long prompt dialogues.",
+              "correct": true
+            },
+            {
+              "label": "SDD eliminates the need for version control since specifications replace git history.",
+              "correct": false
+            },
+            {
+              "label": "SDD requires you to write all the code manually and only use the agent for small suggestions.",
+              "correct": false
+            }
           ]
-        }
-      ]
-    },
-    {
-      "challenge_number": 2,
-      "scenario": "With the team on board, you sketch how the work will actually flow - from setting project-wide direction to shipping individual features - and where you, the human, fit into a loop run largely by the agent.",
-      "questions": [
+        },
         {
-          "id": "2.1",
+          "id": "1.2",
           "type": "single_selection",
           "behavior": "Recognize the human's role as architect and supervisor who supplies context",
           "prompt": "In the SDD workflow, how is the developer's role best described?",
           "options": [
-            {"label": "A typist who carefully writes most of the production code by hand, only occasionally asking the agent for suggestions on tricky sections, boilerplate, or unfamiliar APIs.", "correct": false},
-            {"label": "An architect and reviewer who provides the spec and steers the agent, which handles most of the implementation.", "correct": true},
-            {"label": "A project manager who only creates tickets and never touches code or specs.", "correct": false},
-            {"label": "A QA tester whose only job is to find bugs in the agent's output.", "correct": false}
+            {
+              "label": "A typist who carefully writes most of the production code by hand, only occasionally asking the agent for suggestions on tricky sections, boilerplate, or unfamiliar APIs.",
+              "correct": false
+            },
+            {
+              "label": "An architect and reviewer who provides the spec and steers the agent, which handles most of the implementation.",
+              "correct": true
+            },
+            {
+              "label": "A project manager who only creates tickets and never touches code or specs.",
+              "correct": false
+            },
+            {
+              "label": "A QA tester whose only job is to find bugs in the agent's output.",
+              "correct": false
+            }
           ]
-        }
-      ]
-    },
-    {
-      "challenge_number": 3,
-      "scenario": "It's time to write ContextCafe's constitution: the high-level agreement that will steer every future change. You sit down with the agent to draft it together.",
-      "questions": [
+        },
         {
-          "id": "3.1",
+          "id": "1.3",
           "type": "single_selection",
           "behavior": "Identify the three constitution pillars: mission, tech stack, and roadmap",
           "prompt": "In the SDD workflow, what three documents make up a project's \"constitution\"?",
           "options": [
-            {"label": "mission.md, tech-stack.md, and roadmap.md", "correct": true},
-            {"label": "README.md, CHANGELOG.md, and LICENSE.md", "correct": false},
-            {"label": "requirements.md, plan.md, and validation.md", "correct": false},
-            {"label": "user-stories.md, acceptance-criteria.md, and sprint-backlog.md", "correct": false}
+            {
+              "label": "mission.md, tech-stack.md, and roadmap.md",
+              "correct": true
+            },
+            {
+              "label": "README.md, CHANGELOG.md, and LICENSE.md",
+              "correct": false
+            },
+            {
+              "label": "requirements.md, plan.md, and validation.md",
+              "correct": false
+            },
+            {
+              "label": "user-stories.md, acceptance-criteria.md, and sprint-backlog.md",
+              "correct": false
+            }
           ]
-        }
-      ]
-    },
-    {
-      "challenge_number": 4,
-      "scenario": "The constitution is committed. Now you tackle the first roadmap feature, moving it through planning, implementation, and validation while keeping each step small enough to review.",
-      "questions": [
+        },
         {
-          "id": "4.1",
+          "id": "1.4",
           "type": "single_selection",
           "behavior": "Plan a feature spec covering plan, requirements, and validation before coding",
           "prompt": "When creating a feature spec in SDD, which three documents are typically written?",
           "options": [
-            {"label": "design.md, code.md, and tests.md", "correct": false},
-            {"label": "plan.md, requirements.md, and validation.md", "correct": true},
-            {"label": "README.md, CONTRIBUTING.md, and CHANGELOG.md", "correct": false},
-            {"label": "mission.md, tech-stack.md, and roadmap.md", "correct": false}
+            {
+              "label": "design.md, code.md, and tests.md",
+              "correct": false
+            },
+            {
+              "label": "plan.md, requirements.md, and validation.md",
+              "correct": true
+            },
+            {
+              "label": "README.md, CONTRIBUTING.md, and CHANGELOG.md",
+              "correct": false
+            },
+            {
+              "label": "mission.md, tech-stack.md, and roadmap.md",
+              "correct": false
+            }
           ]
         },
         {
-          "id": "4.2",
+          "id": "1.5",
           "type": "single_selection",
           "behavior": "Implement features in small, manageable steps with cleanly cleared context",
           "prompt": "What are the three main phases of the SDD feature cycle?",
           "options": [
-            {"label": "Research, Write, Deploy", "correct": false},
-            {"label": "Specify, Compile, Test", "correct": false},
-            {"label": "Plan, Implement, Validate", "correct": true},
-            {"label": "Design, Code, Ship", "correct": false}
+            {
+              "label": "Research, Write, Deploy",
+              "correct": false
+            },
+            {
+              "label": "Specify, Compile, Test",
+              "correct": false
+            },
+            {
+              "label": "Plan, Implement, Validate",
+              "correct": true
+            },
+            {
+              "label": "Design, Code, Ship",
+              "correct": false
+            }
           ]
-        }
-      ]
-    },
-    {
-      "challenge_number": 5,
-      "scenario": "ContextCafe is evolving. Priorities shift, new requirements arrive, and the team even wants to bring an older, spec-less project into the same workflow. You decide how and when to adjust course.",
-      "questions": [
+        },
         {
-          "id": "5.1",
+          "id": "1.6",
           "type": "single_selection",
           "behavior": "Keep specs and code in sync to prevent drift and reduce cognitive and AI fatigue",
           "prompt": "Why should you ask the agent to make code changes for you instead of editing files directly whenever possible?",
           "options": [
-            {"label": "To save context tokens in the agent's memory.", "correct": false},
-            {"label": "Because developers shouldn't be allowed to touch code in an SDD project.", "correct": false},
-            {"label": "To prevent drift — the agent can update the related specs at the same time, keeping docs and code in sync.", "correct": true},
-            {"label": "Because manually editing code is always slower than asking an agent, especially on larger refactors that span multiple files and directories in a project.", "correct": false}
+            {
+              "label": "To save context tokens in the agent's memory.",
+              "correct": false
+            },
+            {
+              "label": "Because developers shouldn't be allowed to touch code in an SDD project.",
+              "correct": false
+            },
+            {
+              "label": "To prevent drift — the agent can update the related specs at the same time, keeping docs and code in sync.",
+              "correct": true
+            },
+            {
+              "label": "Because manually editing code is always slower than asking an agent, especially on larger refactors that span multiple files and directories in a project.",
+              "correct": false
+            }
           ]
         },
         {
-          "id": "5.2",
+          "id": "1.7",
           "type": "single_selection",
           "behavior": "Decide when to handle a change during replanning versus scheduling it as a new roadmap feature",
           "prompt": "Why is it important to \"replan\" between features in the SDD workflow?",
           "options": [
-            {"label": "Replanning is only needed when something has gone badly wrong and you need to throw out most of your existing progress and restart the project from scratch.", "correct": false},
-            {"label": "Replanning is optional and most teams skip it to ship faster.", "correct": false},
-            {"label": "It's a chance to reflect, update the constitution and roadmap, and refine your workflow — a normal step, not a sign of failure.", "correct": true},
-            {"label": "Replanning means throwing out your existing constitution and writing a new one from scratch.", "correct": false}
+            {
+              "label": "Replanning is only needed when something has gone badly wrong and you need to throw out most of your existing progress and restart the project from scratch.",
+              "correct": false
+            },
+            {
+              "label": "Replanning is optional and most teams skip it to ship faster.",
+              "correct": false
+            },
+            {
+              "label": "It's a chance to reflect, update the constitution and roadmap, and refine your workflow — a normal step, not a sign of failure.",
+              "correct": true
+            },
+            {
+              "label": "Replanning means throwing out your existing constitution and writing a new one from scratch.",
+              "correct": false
+            }
           ]
         },
         {
-          "id": "5.3",
+          "id": "1.8",
           "type": "single_selection",
           "behavior": "Introduce SDD to brownfield/legacy projects by reverse-engineering specs from existing artifacts",
           "prompt": "Can Spec-Driven Development be applied to an existing (legacy) codebase, or only to new projects?",
           "options": [
-            {"label": "SDD can only be used on projects that were originally started with an AI agent.", "correct": false},
-            {"label": "Both. On a legacy project, the agent reverse-engineers a constitution from the existing code and docs, and you continue with the normal workflow.", "correct": true},
-            {"label": "SDD only works for small personal projects, not production codebases.", "correct": false},
-            {"label": "SDD is only meant for greenfield projects — any legacy codebase would need a complete rewrite before the workflow could meaningfully be applied to it.", "correct": false}
+            {
+              "label": "SDD can only be used on projects that were originally started with an AI agent.",
+              "correct": false
+            },
+            {
+              "label": "Both. On a legacy project, the agent reverse-engineers a constitution from the existing code and docs, and you continue with the normal workflow.",
+              "correct": true
+            },
+            {
+              "label": "SDD only works for small personal projects, not production codebases.",
+              "correct": false
+            },
+            {
+              "label": "SDD is only meant for greenfield projects — any legacy codebase would need a complete rewrite before the workflow could meaningfully be applied to it.",
+              "correct": false
+            }
           ]
-        }
-      ]
-    },
-    {
-      "challenge_number": 6,
-      "scenario": "As the practice spreads across the team, you look for ways to make the workflow faster, repeatable, and portable - so it isn't tied to any one agent or tool.",
-      "questions": [
+        },
         {
-          "id": "6.1",
+          "id": "1.9",
           "type": "single_selection",
           "behavior": "Apply agent standards such as AGENTS.md, Agent Skills, and ACP to stay agent-independent",
           "prompt": "Why is it valuable for an SDD workflow to be \"agent-agnostic\"?",
           "options": [
-            {"label": "The agent landscape moves fast. Keeping specs and tools independent of any single agent lets you switch tools without rebuilding your workflow.", "correct": true},
-            {"label": "Agent-agnostic workflows are required by law for any enterprise software project.", "correct": false},
-            {"label": "Agent-agnostic workflows run measurably faster because they avoid vendor-specific optimizations that would otherwise tie your pipeline to a single proprietary runtime.", "correct": false},
-            {"label": "Agent-agnostic workflows mean you never need to use a coding agent at all.", "correct": false}
+            {
+              "label": "The agent landscape moves fast. Keeping specs and tools independent of any single agent lets you switch tools without rebuilding your workflow.",
+              "correct": true
+            },
+            {
+              "label": "Agent-agnostic workflows are required by law for any enterprise software project.",
+              "correct": false
+            },
+            {
+              "label": "Agent-agnostic workflows run measurably faster because they avoid vendor-specific optimizations that would otherwise tie your pipeline to a single proprietary runtime.",
+              "correct": false
+            },
+            {
+              "label": "Agent-agnostic workflows mean you never need to use a coding agent at all.",
+              "correct": false
+            }
           ]
         },
         {
-          "id": "6.2",
+          "id": "1.10",
           "type": "single_selection",
           "behavior": "Use agent skills to automate repeatable SDD workflows",
           "prompt": "What is a \"skill\" in the context of agentic coding, and when would you create one?",
           "options": [
-            {"label": "A skill is a paid plugin you buy from an app store.", "correct": false},
-            {"label": "A skill is a type of spec that replaces plan.md, requirements.md, and validation.md.", "correct": false},
-            {"label": "A reusable package of instructions and resources that gives an agent a repeatable capability — handy when you catch yourself retyping the same prompts.", "correct": true},
-            {"label": "A skill is a special kind of AI model that only certain commercial agents support, usually offered as a paid upgrade on top of the base model you started with.", "correct": false}
+            {
+              "label": "A skill is a paid plugin you buy from an app store.",
+              "correct": false
+            },
+            {
+              "label": "A skill is a type of spec that replaces plan.md, requirements.md, and validation.md.",
+              "correct": false
+            },
+            {
+              "label": "A reusable package of instructions and resources that gives an agent a repeatable capability — handy when you catch yourself retyping the same prompts.",
+              "correct": true
+            },
+            {
+              "label": "A skill is a special kind of AI model that only certain commercial agents support, usually offered as a paid upgrade on top of the base model you started with.",
+              "correct": false
+            }
           ]
         }
       ]
